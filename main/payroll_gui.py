@@ -1,0 +1,1202 @@
+import customtkinter as ctk
+from tkinter import messagebox, ttk
+from payroll_sys import *
+from db_handling import PayrollDataFileHandling
+import datetime
+from dsa_algo import *
+
+class AdminLoginFrame(ctk.CTkFrame):
+    def __init__(self, master, on_login_success,  width=800, height=500, fg_color="#e0e0e0", border_color="black", border_width=1, corner_radius=0):
+        super().__init__(master, width=width, height=height, fg_color=fg_color, 
+                        border_color=border_color, border_width=border_width, 
+                        corner_radius=corner_radius)
+        
+        self.master.bind('<Return>', lambda event: self.login_action())
+        
+        self.on_login_success = on_login_success
+        self.primary_font = ctk.CTkFont(family="Helvetica", size=18)
+
+        ctk.CTkLabel(self,
+                    text="Admin Login", 
+                    font=("Helvetica", 48), 
+                    text_color="black"
+                    ).place(relx=0.5, rely=0.25, anchor="center")
+
+        ctk.CTkLabel(self, 
+                    text="Username", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).place(relx=0.35, rely=0.45, anchor="e")
+
+        self.username_entry = ctk.CTkEntry(self, 
+                                            width=220, 
+                                            height=40, 
+                                            fg_color="white", 
+                                            border_color="black", 
+                                            text_color="black", 
+                                            corner_radius=10,
+                                            font=self.primary_font
+                                            )
+        self.username_entry.place(relx=0.42, rely=0.45, anchor="w")
+
+        ctk.CTkLabel(self, 
+                    text="Password", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).place(relx=0.35, rely=0.55, anchor="e")
+
+        self.password_entry = ctk.CTkEntry(self, 
+                                            width=220, 
+                                            height=40, 
+                                            fg_color="white", 
+                                            border_color="black", 
+                                            text_color="black", 
+                                            show="*", 
+                                            corner_radius=10,
+                                            font=self.primary_font
+                                            )
+        self.password_entry.place(relx=0.42, rely=0.55, anchor="w")
+
+        self.show_pass_var = ctk.StringVar(value="off")
+        self.show_pass = ctk.CTkCheckBox(self, 
+                                        text="Show Password", 
+                                        fg_color="#93d97d", 
+                                        text_color="black", 
+                                        hover_color="green" ,  
+                                        variable=self.show_pass_var, 
+                                        onvalue="on", offvalue="off", 
+                                        command=self.toggle_show_password,
+                                        font=self.primary_font
+                                        )
+        self.show_pass.place(relx=0.62, rely=0.65, anchor="e")
+
+        self.login_button = ctk.CTkButton(self, 
+                                        text="Login", 
+                                        font=("Helvetica", 20, "bold"), 
+                                        fg_color="#93d97d", 
+                                        hover_color="#7cb368", 
+                                        text_color="white", 
+                                        width=120, 
+                                        height=45, 
+                                        corner_radius=8, 
+                                        command=self.login_action,
+                                        )
+        self.login_button.place(relx=0.56, rely=0.75, anchor="center")
+
+    def toggle_show_password(self):
+        if self.show_pass_var.get() == "on":
+            self.password_entry.configure(show="")
+        else:
+            self.password_entry.configure(show="*")
+
+    def login_action(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if self.master.file_handler.read_admin_data(username, password):
+            self.master.unbind('<Return>')
+            messagebox.showinfo("Success!", "Welcome Back {}".format(username))
+            self.on_login_success(username)
+        else:
+            messagebox.showerror("Error", "Invalid Credentials")
+
+class HomePageFrame(ctk.CTkFrame):
+    def __init__(self, master, username="admin"):
+        super().__init__(master, fg_color="white")
+
+        self.primary_font = ctk.CTkFont(family="Helvetica", size=18)
+
+        ctk.CTkLabel(self, 
+                    bg_color="#12E068", 
+                    width=1280, 
+                    height=50, 
+                    text="Payroll Management System for Employees", 
+                    text_color="black", 
+                    font=("Helvetica", 20, "bold")
+                    ).pack(side="top", fill="x")
+        
+        self.logout_btn = ctk.CTkButton(self, 
+                                        text="Logout", 
+                                        width=100, 
+                                        height=30, 
+                                        fg_color="#e74c3c",
+                                        hover_color="#c0392b",
+                                        text_color="white",
+                                        font=("Helvetica", 12, "bold"),
+                                        command=self.master.handle_logout
+                                        )
+        self.logout_btn.place(relx=0.98, rely=0.015, anchor="ne")
+        
+        ctk.CTkLabel(self, 
+                    text=f"Welcome {username}!",
+                    font=("Helvetica", 75, "bold"), 
+                    text_color="black"
+                    ).pack(pady=(75, 25))
+        
+        btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        btn_frame.pack(pady=10, expand=True)
+        
+        create_btn = ctk.CTkButton(btn_frame, 
+                                    text="Create", 
+                                    height=65, 
+                                    width=150, 
+                                    fg_color="transparent", 
+                                    text_color="black", 
+                                    border_width=3, 
+                                    border_color="black", 
+                                    hover_color="#12E068", 
+                                    command=self.open_create_employee_win,
+                                    font=self.primary_font
+                                    )
+        create_btn.grid(row=1, column=0, padx=(0,20), pady=5)
+
+        ctk.CTkLabel(btn_frame, 
+                    text="Create EMPLOYEE", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).grid(row=1, column=1, padx=5, pady=5)
+
+        del_btn = ctk.CTkButton(btn_frame, 
+                                text="Delete", 
+                                height=65, 
+                                width=150, 
+                                fg_color="transparent", 
+                                text_color="black", 
+                                border_width=3, 
+                                border_color="black", 
+                                hover_color="#12E068",
+                                font=self.primary_font,
+                                command=self.open_delete_employee_win
+                                )
+        del_btn.grid(row=2, column=0, padx=(0,20), pady=5)
+        ctk.CTkLabel(btn_frame, 
+                    text="Delete EMPLOYEE", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).grid(row=2, column=1, padx=5, pady=5)
+
+        search_btn = ctk.CTkButton(btn_frame, 
+                                    text="Search", 
+                                    height=65, 
+                                    width=150, 
+                                    fg_color="transparent", 
+                                    text_color="black", 
+                                    border_width=3, 
+                                    border_color="black", 
+                                    hover_color="#12E068",
+                                    font=self.primary_font,
+                                    command=self.open_search_employee_win
+                                    )
+        search_btn.grid(row=3, column=0, padx=(0,20), pady=(5, 50))
+        ctk.CTkLabel(btn_frame, 
+                    text="Search EMPLOYEE", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).grid(row=3, column=1, padx=5, pady=(5,50))
+
+        process_btn = ctk.CTkButton(btn_frame, 
+                                    text="Process", 
+                                    height=65, 
+                                    width=150, 
+                                    fg_color="transparent", 
+                                    text_color="black", 
+                                    border_width=3, 
+                                    border_color="black", 
+                                    hover_color="#12E068",
+                                    font=self.primary_font,
+                                    command=self.master.show_process_page
+                                    )
+        process_btn.grid(row=4, column=0, padx=(0,20), pady=5)
+        ctk.CTkLabel(btn_frame, 
+                    text="Process EMPLOYEE", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).grid(row=4, column=1, padx=5, pady=5)
+
+        view_all_lbl = ctk.CTkLabel(self, 
+            text="View All Employees", 
+            font=self.primary_font, 
+            text_color="blue", 
+            cursor="hand2"    
+            )
+        view_all_lbl.pack(side="right", padx=20)
+        view_all_lbl.bind("<Button-1>", lambda e: self.master.show_view_all_page())
+        
+    def open_create_employee_win(self):
+        self.create_emp = ctk.CTkToplevel(self.winfo_toplevel())
+        self.create_emp.title("Creating Employee")
+        self.create_emp.geometry("500x700")
+        self.create_emp.configure(fg_color="#e0e0e0")
+        self.create_emp.deiconify()
+        print("Opened", self.create_emp)
+
+        self.create_emp.protocol("WM_DELETE_WINDOW", self.event_exit_create_win)
+
+        self.dept_pos_map = {
+                "Human Resources": [
+                    "HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst"
+                ],
+                "Engineering & Development": [
+                    "Software Engineer", "Embedded Systems Developer", "Mobile App Developer", 
+                    "DevOps Engineer", "QA Automation Engineer"
+                ],
+                "Data & Security": [
+                    "AI Engineer", "Data Scientist", "Cybersecurity Analyst", "Database Administrator"
+                ],
+                "Support & Operations": [
+                    "UI/UX Developer", "Technical Support Lead", "Operations Coordinator", "Project Manager"
+                ],
+                "IT Infrastructure & Cloud": [
+                    "Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk"
+                ]
+        } 
+
+        self.salary_rates = {
+                # Engineering
+                "Software Engineer": {"Full": 60000, "Part": 600},
+                "Embedded Systems Developer": {"Full": 65000, "Part": 650},
+                "Mobile App Developer": {"Full": 55000, "Part": 550},
+                "DevOps Engineer": {"Full": 70000, "Part": 700},
+                "QA Automation Engineer": {"Full": 50000, "Part": 500},
+    
+                # Data & Security
+                "AI Engineer": {"Full": 85000, "Part": 850},
+                "Data Scientist": {"Full": 80000, "Part": 800},
+                "Cybersecurity Analyst": {"Full": 75000, "Part": 750},
+                "Database Administrator": {"Full": 65000, "Part": 650},
+    
+                # HR
+                "HR Manager": {"Full": 45000, "Part": 450},
+                "Recruiter": {"Full": 35000, "Part": 350},
+                "Training Specialist": {"Full": 40000, "Part": 400},
+                "Compensation Analyst": {"Full": 42000, "Part": 420},
+    
+                # Support & Ops
+                "UI/UX Developer": {"Full": 50000, "Part": 500},
+                "Technical Support Lead": {"Full": 35000, "Part": 350},
+                "Operations Coordinator": {"Full": 38000, "Part": 380},
+                "Project Manager": {"Full": 65000, "Part": 650},
+
+                # Infrastructure
+                "Cloud Architect": {"Full": 95000, "Part": 950},
+                "Network Engineer": {"Full": 55000, "Part": 550},
+                "Systems Administrator": {"Full": 50000, "Part": 500},
+                "IT Helpdesk": {"Full": 25000, "Part": 250}
+        }
+
+        ctk.CTkLabel(self.create_emp, 
+                    text="Employee Information", 
+                    text_color="black", 
+                    font=("Helvetica", 40, "bold")
+                    ).pack(padx=5, pady=15)
+        
+        ctk.CTkLabel(self.create_emp, 
+                    text="Basic Information", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).pack(padx=5, pady=5)
+
+        self.field_frame = ctk.CTkFrame(self.create_emp, fg_color="#e0e0e0", width=450, height=600)
+        self.field_frame.pack(fill="x", padx=5, pady=5)
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="ID", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=0, column=0, sticky="w", padx=5, pady=10)
+        
+        next_id = self.master.file_handler.get_next_id() 
+        self.id_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
+        self.id_entry.grid(row=0, column=1)
+        self.id_entry.insert(0, str(next_id))
+        self.id_entry.configure(state="readonly")
+
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="Type", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=0, column=2, sticky="e", padx=5, pady=10)
+        
+        self.emp_dropdown = ctk.CTkComboBox(self.field_frame, 
+                                            values=["Part-Time", "Full-Time"], 
+                                            width=135, 
+                                            state="readonly", 
+                                            font=self.primary_font, 
+        command=lambda status: [self.handle_emp_status(status), self.update_salary_display(self.position_dropdown.get())])
+        self.emp_dropdown.grid(row=0, column=3)
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="Name", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=1, column=0, sticky="w", padx=5, pady=10)
+        self.name_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
+        self.name_entry.grid(row=1, column=1)
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="Gender", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=1, column=2, sticky="e", padx=5, pady=10)
+
+        gender_val = ["Male", "Female"]
+        self.gender_dropdown = ctk.CTkComboBox(self.field_frame, values=gender_val, width=135, state="readonly", font=self.primary_font)
+        self.gender_dropdown.grid(row=1, column=3)
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="Department", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=2, column=0, sticky="w", padx=5, pady=10)
+        
+        self.department_dropdown = ctk.CTkComboBox(self.field_frame, values=list(self.dept_pos_map.keys()), width=250, state="readonly", font=self.primary_font, command=self.update_position_list)
+        self.department_dropdown.grid(row=2, column=1, columnspan=2)
+
+        ctk.CTkLabel(self.field_frame, 
+                    text="Position", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=3, column=0, sticky="w", padx=5, pady=10)
+        
+        self.position_dropdown = ctk.CTkComboBox(self.field_frame, values=[], width=250, state="readonly", font=self.primary_font, command=self.update_salary_display)
+        self.position_dropdown.grid(row=3, column=1, columnspan=2)
+
+        ctk.CTkLabel(self.create_emp, 
+                    text="Salary Information", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).pack(padx=5, pady=5)
+        
+        self.salary_frame = ctk.CTkFrame(self.create_emp, fg_color="#e0e0e0", width=450, height=600)
+        self.salary_frame.pack(fill="x", padx=5, pady=5)
+
+        self.salary_label = ctk.CTkLabel(
+                    self.salary_frame, 
+                    text="Base Salary" , 
+                    font=self.primary_font
+                    )
+        self.salary_label.grid(row=0, column=0)
+        
+        self.salary_entry = ctk.CTkEntry(self.salary_frame, width=100, height=30, font=self.primary_font)
+        self.salary_entry.grid(row=0, column=1)
+        self.salary_entry.insert(0, "₱0")
+        self.salary_entry.configure(state="readonly")
+
+        self.hours_worked_label = ctk.CTkLabel(
+                    self.salary_frame, 
+                    text="Hours Worked" , 
+                    font=self.primary_font
+                    )
+        
+        self.hours_worked = ctk.CTkEntry(self.salary_frame, width=100, height=30, font=self.primary_font)
+
+        ctk.CTkLabel(self.salary_frame, 
+                    text="Email", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=1, column=0, sticky="w", padx=5, pady=10)
+
+        self.email_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
+        self.email_entry.grid(row=1, column=1, columnspan=2, sticky="w", padx=5, pady=10)
+
+        ctk.CTkLabel(self.salary_frame, 
+                    text="Bank Account", 
+                    text_color="black", 
+                    font=self.primary_font
+                    ).grid(row=2, column=0, sticky="w", padx=5, pady=10)
+
+        self.bank_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
+        self.bank_entry.grid(row=2, column=1, columnspan=2, sticky="w", padx=5, pady=10)
+
+
+        self.save_btn = ctk.CTkButton(
+                                    self.create_emp, 
+                                    text="Save Employee", 
+                                    font=self.primary_font,
+                                    fg_color="#12E068",
+                                    text_color="black",
+                                    command=self.handle_employee_data
+                                    )
+        self.save_btn.pack(pady=20)
+
+        self.toplevelwindow = self.save_btn.winfo_toplevel()
+    
+    def update_position_list(self, selected_dept):
+        positions = self.dept_pos_map.get(selected_dept, [])
+        self.position_dropdown.configure(values=positions)
+        self.position_dropdown.set("") 
+    
+        self.salary_entry.configure(state="normal")
+        self.salary_entry.delete(0, "end")
+        self.salary_entry.insert(0, "₱0")
+        self.salary_entry.configure(state="readonly")
+
+    def update_salary_display(self, pos):
+        is_part_time = self.emp_dropdown.get() == "Part-Time"
+        rates = self.salary_rates.get(pos, {"Full": 0, "Part": 0})
+        amount = rates["Part"] if is_part_time else rates["Full"]
+
+        self.salary_entry.configure(state="normal")
+        self.salary_entry.delete(0, "end")
+        self.salary_entry.insert(0, f"₱{amount}")
+        self.salary_entry.configure(state="readonly")
+
+        
+    def handle_emp_status(self, status):
+        if status == "Part-Time":
+            self.salary_label.configure(text="Hourly Rate")
+            self.hours_worked_label.grid(row=0, column=2, sticky="e", padx=5, pady=10)
+            self.hours_worked.grid(row=0, column=3, sticky="e", padx=5, pady=10)
+        else:
+            self.salary_label.configure(text="Monthly Salary")
+            self.hours_worked.delete(0, "end")
+            self.hours_worked_label.grid_forget()
+            self.hours_worked.grid_forget()
+
+    def event_exit_create_win(self):
+        if self.name_entry.get() != "":
+            if messagebox.askyesno("Exit", "You have unsaved data. Are you sure you want to close this window?"):
+                self.create_emp.destroy()
+            else:
+                self.toplevelwindow.lift()
+                self.toplevelwindow.focus_force()
+        else:
+            self.create_emp.destroy()
+            
+
+    def handle_employee_data(self):
+        try:
+            manager = self.master.payroll_system
+            
+            eid = self.id_entry.get()
+            name = self.name_entry.get()
+            gender = self.gender_dropdown.get()
+            dep = self.department_dropdown.get()
+            pos = self.position_dropdown.get()
+            emp_type = self.emp_dropdown.get()
+            hire_date = datetime.datetime.now().strftime("%B %d, %Y")
+            email = self.email_entry.get()
+            bank_account = self.bank_entry.get()
+            salary_val = float(self.salary_entry.get().replace("₱", ""))
+
+            if eid == "" or name == "" or gender == "" or dep == "" or pos == "" or emp_type == "" or email == "" or bank_account == "":
+                messagebox.showerror("Error", "Please Input All Fields.")
+                self.toplevelwindow.lift()
+                self.toplevelwindow.focus_force()
+                return
+                
+            emp_id = self.master.file_handler.commit_next_id()
+
+            if emp_type == "Part-Time":
+                hours = float(self.hours_worked.get())
+                manager.add_parttime_employee(emp_id, name, gender, dep, pos, hire_date, hours, salary_val, email, bank_account)
+            else:
+                manager.add_fulltime_employee(emp_id, name, gender, dep, pos, hire_date, salary_val, email, bank_account)
+            
+
+            print(manager.employees)
+            messagebox.showinfo("Success", f"Employee {name} ({pos}) saved!")
+
+        
+            self.toplevelwindow.lift()
+            self.toplevelwindow.focus_force()
+
+            self.salary_entry.configure(state="normal")
+            self.salary_entry.delete(0, "end")
+            self.salary_entry.insert(0, "₱0")
+            self.salary_entry.configure(state="readonly")
+
+            next_id = self.master.file_handler.get_next_id()
+            self.id_entry.configure(state="normal")
+            self.id_entry.delete(0, "end")
+            self.id_entry.insert(0, str(next_id))
+            self.id_entry.configure(state="readonly")
+
+            self.name_entry.delete(0, "end")
+            self.gender_dropdown.set("")
+            self.emp_dropdown.set("")
+            self.department_dropdown.set("")
+            self.position_dropdown.set("")
+            self.position_dropdown.configure(values=[])
+            self.email_entry.delete(0, "end")
+            self.bank_entry.delete(0, "end")
+    
+            self.hours_worked.delete(0, "end")
+            self.name_entry.focus()
+        except ValueError:
+            messagebox.showerror("Input Error", "Please ensure all numeric fields (Salary/Hours) are filled correctly.")
+            self.toplevelwindow.lift()
+            self.toplevelwindow.focus_force()
+
+    def open_delete_employee_win(self):
+        self.del_win = ctk.CTkToplevel(self.winfo_toplevel())
+        self.del_win.title("Delete Employee")
+        self.del_win.geometry("400x250")
+        self.del_win.attributes("-topmost", True)
+
+        ctk.CTkLabel(self.del_win, text="Remove Employee", font=("Helvetica", 24, "bold")).pack(pady=20)
+        
+        ctk.CTkLabel(self.del_win, text="Enter Employee Name or ID:", font=self.primary_font).pack(pady=5)
+        
+        self.del_id_entry = ctk.CTkEntry(self.del_win, width=200, font=self.primary_font)
+        self.del_id_entry.pack(pady=10)
+        self.del_id_entry.focus()
+
+        delete_confirm_btn = ctk.CTkButton(self.del_win, 
+                                        text="Confirm Deletion", 
+                                        fg_color="#e74c3c",
+                                        hover_color="#c0392b",
+                                        command=self.handle_delete_action)
+        delete_confirm_btn.pack(pady=20)
+
+    def handle_delete_action(self):
+        query = self.del_id_entry.get().strip()
+        manager = self.master.payroll_system
+
+        if not query:
+            messagebox.showwarning("Input Required", "Please enter a Name or ID.")
+            return
+
+        emp = manager.search_employee_by_id(query)
+        if not emp:
+            matches = manager.search_employees_by_name(query)
+            if len(matches) == 1:
+                emp = matches[0]
+            elif len(matches) > 1:
+                messagebox.showwarning("Ambiguous Name", "Multiple employees found with that name. Please use the specific ID.")
+                self.del_win.lift()
+                return
+
+        if emp:
+            if messagebox.askyesno("Confirm Deletion", f"Are you sure you want to permanently delete {emp.name} (ID: {emp.id})?"):
+                manager.delete_employee_by_name(emp)
+                messagebox.showinfo("Deleted", f"Employee {emp.name} has been removed.")
+                self.del_win.destroy()
+        else:
+            messagebox.showerror("Not Found", f"No record found for '{query}'.")
+            self.del_win.lift()
+
+    def open_search_employee_win(self):
+        self.search_win = ctk.CTkToplevel(self.winfo_toplevel())
+        self.search_win.title("Search Employee")
+        self.search_win.geometry("400x600")
+        self.search_win.attributes("-topmost", True)
+
+        ctk.CTkLabel(self.search_win, text="Employee Search", font=("Helvetica", 24, "bold")).pack(pady=20)
+        ctk.CTkLabel(self.search_win, text="Enter Employee Name or ID:", font=self.primary_font).pack(pady=5)
+        
+        self.search_id_entry = ctk.CTkEntry(self.search_win, width=200)
+        self.search_id_entry.pack(pady=10)
+        self.search_id_entry.focus()
+
+        ctk.CTkButton(self.search_win, text="Search Now", command=self.handle_search_action).pack(pady=20)
+        
+        result_frame = ctk.CTkFrame(self.search_win, border_color="black", width=250, height=300)
+        result_frame.pack(pady=10)
+        ctk.CTkLabel(result_frame, text="Search Result", bg_color="#c2f0d1", height=40, width=300, 
+                    text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=1, pady=(0,20))
+        self.search_result = ctk.CTkLabel(result_frame, text="")
+        self.search_result.grid(row=1, column=0, columnspan=1, pady=10)
+
+    def handle_search_action(self):
+        query = self.search_id_entry.get().strip()
+        manager = self.master.payroll_system
+        
+        if not query:
+            messagebox.showwarning("Input Required", "Please enter a Name or ID.")
+            return
+
+        emp = manager.search_employee_by_id(query)
+        
+        if not emp:
+            matches = manager.search_employees_by_name(query)
+            if len(matches) == 1:
+                emp = matches[0]
+            elif len(matches) > 1:
+                names = "\n".join([f"ID: {e.id} - {e.name}" for e in matches])
+                self.search_result.configure(text=f"Found multiple employees:\n\n{names}\n\nPlease search by specific ID.")
+                self.search_win.lift()
+                return
+
+        if emp:
+            info = (f"ID: {emp.id}\nName: {emp.name}\nType: {emp.emp_type}\n"
+                    f"Dept: {emp.department}\nPos: {emp.position}\n"
+                    f"Salary: ₱{emp.get_salary():,.2f}")
+            self.search_result.configure(text=f"Details\n{info}")
+            self.search_win.lift()
+        else:
+            messagebox.showerror("Not Found", f"No employee found matching '{query}'.")
+            self.search_win.lift()
+        
+class ViewEmployeesFrame(ctk.CTkFrame):
+    def __init__(self, master, on_back):
+        super().__init__(master, fg_color="white")
+        self.master = master
+
+        ctk.CTkLabel(self, text="EMPLOYEE LIST", 
+                    font=("Helvetica", 40, "bold"), 
+                    text_color="black").pack(pady=20)
+        
+        container = ctk.CTkFrame(self, fg_color="white", border_color="black", border_width=1)
+        container.pack(fill="both", expand=True, padx=40, pady=(10, 20))
+        self.reverse_var = ctk.BooleanVar(value=False)
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview", 
+                        background="white", 
+                        foreground="black", 
+                        rowheight=35, 
+                        fieldbackground="white", 
+                        font=("Helvetica", 11))
+        style.configure("Treeview.Heading", 
+                        font=("Helvetica", 12, "bold"), 
+                        background="#c2f0d1",
+                        foreground="black")
+        style.map("Treeview", background=[('selected', '#12E068')])
+
+        cols = ("ID", "Name", "Gender", "Department", "Position", "Hire Date", "Type", "Salary")
+        self.tree = ttk.Treeview(container, columns=cols, show="headings")
+
+        for col in cols:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, anchor="center", width=120)
+
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscroll=scrollbar.set)
+
+        self.tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        self.populate_data()
+
+        sort_frame = ctk.CTkFrame(self, fg_color="white")
+        sort_frame.pack(fill="both", expand=True, padx=40, pady=(10, 20))
+        
+        ctk.CTkLabel(sort_frame, text="Sort By", 
+                    font=("Helvetica", 11), 
+                    text_color="black").pack(side="left", padx=5)
+        
+        self.sort_dropdown = ctk.CTkComboBox(sort_frame, values=["Alphabetical", "Salary", "Department"], command=self.handle_sorting, state="readonly", width=150)
+        self.sort_dropdown.pack(side="left", padx=5)
+
+        self.checkbox_sort = ctk.CTkCheckBox(
+        sort_frame, # or wherever your sorting controls are
+        text="Reverse", 
+        variable=self.reverse_var,
+        command=self.handle_sorting
+        )
+
+        ctk.CTkButton(sort_frame, text="Back to Dashboard", 
+                    command=on_back, 
+                    width=200, height=40).pack(side="right", padx=5)
+
+    def handle_sorting(self, choice=None):
+        """Handles Sorting"""
+        sorter_tool = self.master.sorter
+        
+        if choice is None:
+            choice = self.sort_dropdown.get()
+            
+        if choice == "Salary":
+            if not self.checkbox_sort.winfo_ismapped(): # Only pack if not already visible
+                self.checkbox_sort.pack(side="left", padx=5)   
+        else:
+            if self.checkbox_sort.winfo_ismapped(): # Only forget if currently visible
+                self.checkbox_sort.pack_forget()
+
+        is_reversed = self.reverse_var.get()
+
+        original_list = list(self.master.payroll_system.employees)
+
+        sorted_list = sorter_tool.merge_sort(original_list, choice, is_reversed)
+        print(f"Sorting triggered for: {choice}")
+        self.update_treeview(sorted_list)
+
+    def update_treeview(self, employee_list):
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        for emp in employee_list:
+            self.tree.insert("", "end", values=(
+                emp.id, emp.name, emp.gender, emp.department, 
+                emp.position, emp.hire_date, emp.emp_type, 
+                f"₱{emp.get_salary():,.2f}"
+            ))
+
+    def populate_data(self):
+        """Fetch and display all employees from the manager."""
+        for emp in self.master.payroll_system.employees:
+            self.tree.insert("", "end", values=(
+                emp.id,
+                emp.name,
+                emp.gender,
+                emp.department,
+                emp.position,
+                emp.hire_date,
+                emp.emp_type,
+                f"₱{emp.get_salary():,.2f}"
+            ))
+
+class ProcessEmployeeFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color="#f0f0f0")
+        self.master = master
+        self.primary_font = ctk.CTkFont(family="Helvetica", size=16, weight="bold")
+        
+        ctk.CTkLabel(self, bg_color="#12E068", width=1280, height=50, 
+                    text="Payroll Management System for Employees", 
+                    text_color="black", font=("Helvetica", 20, "bold")).pack(side="top", fill="x")
+
+        # Main Layout Container
+        main_container = ctk.CTkFrame(self, fg_color="transparent")
+        main_container.pack(expand=True, pady=20)
+
+        # --- LEFT PANEL: EMPLOYEE DETAILS ---
+        self.left_panel = ctk.CTkFrame(main_container, fg_color="white", border_color="black", border_width=1, width=500, height=500)
+        self.left_panel.grid(row=0, column=0, padx=20, sticky="nsew")
+        self.left_panel.grid_propagate(False)
+
+        ctk.CTkLabel(self.left_panel, text="EMPLOYEE DETAILS", bg_color="#c2f0d1", height=40, width=500, 
+                    text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=3, pady=(0, 20))
+
+        ctk.CTkLabel(self.left_panel, text="EMPLOYEE ID:", text_color="black", font=self.primary_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.search_id_entry = ctk.CTkEntry(self.left_panel, width=200, fg_color="#c2f0d1", border_color="black")
+        self.search_id_entry.grid(row=1, column=1, padx=5)
+        ctk.CTkButton(self.left_panel, text="SEARCH", width=100, fg_color="yellow", text_color="black", hover_color="#cccc00", 
+                    command=self.handle_search).grid(row=1, column=2, padx=5)
+
+        # Explicitly Defined Entry Fields
+        # Name
+        ctk.CTkLabel(self.left_panel, text="EMPLOYEE NAME:", text_color="black", font=self.primary_font).grid(row=2, column=0, padx=10, pady=10, sticky="w")
+        self.name_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.name_entry.grid(row=2, column=1, columnspan=2, padx=5, pady=10, sticky="w")
+
+        # Gender
+        ctk.CTkLabel(self.left_panel, text="GENDER:", text_color="black", font=self.primary_font).grid(row=3, column=0, padx=10, pady=10, sticky="w")
+        self.gender_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.gender_entry.grid(row=3, column=1, columnspan=2, padx=5, pady=10, sticky="w")
+
+        # Department
+        ctk.CTkLabel(self.left_panel, text="DEPARTMENT:", text_color="black", font=self.primary_font).grid(row=4, column=0, padx=10, pady=10, sticky="w")
+        self.dept_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.dept_entry.grid(row=4, column=1, columnspan=2, padx=5, pady=10, sticky="w")
+
+        # Position
+        ctk.CTkLabel(self.left_panel, text="POSITION:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=10, pady=10, sticky="w")
+        self.pos_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.pos_entry.grid(row=5, column=1, columnspan=2, padx=5, pady=10, sticky="w")
+
+        # Type
+        ctk.CTkLabel(self.left_panel, text="TYPE:", text_color="black", font=self.primary_font).grid(row=6, column=0, padx=10, pady=10, sticky="w")
+        self.emp_type_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.emp_type_entry.grid(row=6, column=1, columnspan=2, padx=5, pady=10, sticky="w")
+
+        # --- RIGHT PANEL: SALARY DETAILS ---
+        self.right_panel = ctk.CTkFrame(main_container, fg_color="white", border_color="black", border_width=1, width=550, height=500)
+        self.right_panel.grid(row=0, column=1, padx=20, sticky="nsew")
+        self.right_panel.grid_propagate(False)
+
+        ctk.CTkLabel(self.right_panel, text="EMPLOYEE SALARY DETAILS", bg_color="#c2f0d1", height=40, width=550, 
+                    text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=4, pady=(0, 20))
+        
+        ctk.CTkLabel(self.right_panel, text="Date", text_color="black", font=self.primary_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.date_entry = ctk.CTkEntry(self.right_panel, width=150, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.date_entry.grid(row=1, column=1, padx=0, pady=0, sticky="w")
+
+        self.monthly_salary_label = ctk.CTkLabel(self.right_panel, text="Monthly Salary:", font=self.primary_font)
+        self.monthly_salary_entry = ctk.CTkEntry(self.right_panel, width=150)
+
+        self.rate_label = ctk.CTkLabel(self.right_panel, text="Rate / Hour:", font=self.primary_font)
+        self.rate_entry = ctk.CTkEntry(self.right_panel, width=150)
+
+        self.hours_label = ctk.CTkLabel(self.right_panel, text="Total Hours:", font=self.primary_font)
+        self.hours_entry = ctk.CTkEntry(self.right_panel, width=150)
+
+        ctk.CTkLabel(self.right_panel, text="Working Days:", text_color="black", font=self.primary_font).grid(row=4, column=0, padx=20, pady=10, sticky="w")
+        self.total_days_entry = ctk.CTkEntry(self.right_panel, width=150)
+        self.total_days_entry.grid(row=4, column=1, sticky="w")
+        self.total_days_entry.insert(0, "22")
+        self.total_days_entry.configure(state="readonly")
+
+        ctk.CTkLabel(self.right_panel, text="Days Present:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=20, pady=10, sticky="w")
+        self.days_present_entry = ctk.CTkEntry(self.right_panel, width=150)
+        self.days_present_entry.grid(row=5, column=1, sticky="w")
+
+        self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, fg_color="#12E068", 
+                                        text_color="black", font=self.primary_font, command=self.compute_payroll)
+        self.compute_btn.grid(row=6, column=0, columnspan=2, pady=30, padx=20, sticky="ew")
+
+        self.queue_btn = ctk.CTkButton(self.right_panel, text="ADD TO QUEUE", 
+                                        fg_color="orange", text_color="black", 
+                                        command=self.add_to_processing_queue)
+        self.queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
+
+        self.queue_status_label = ctk.CTkLabel(self.right_panel, text="Queue: 0 Employees", text_color="blue")
+        self.queue_status_label.grid(row=8, column=0, columnspan=2, pady=5)
+
+        self.process_all_btn = ctk.CTkButton(self.right_panel, text="PROCESS ENTIRE QUEUE", 
+                                            fg_color="#12E068", text_color="black",
+                                            command=self.process_entire_queue)
+        self.process_all_btn.grid(row=9, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
+
+        ctk.CTkButton(self, text="BACK", fg_color="red", width=120, height=40, font=self.primary_font,
+                    command=lambda: self.master.show_home_page(self.master.auth_user)).pack(pady=10)
+        
+    def auto_compute_for_queue(self, emp):
+        """Processes payroll for an employee object without manual input."""
+        try:
+            if emp.emp_type == "Full-Time":
+                gross = emp.get_salary()
+                reg_pay = gross
+                ot_pay = 0
+            else:
+                rate = getattr(emp, 'hourly_rate', 0)
+                hours = getattr(emp, 'hours_worked', 0)
+                reg_pay = min(hours, 40) * rate
+                ot_pay = max(0, hours - 40) * (rate * 1.5)
+                gross = reg_pay + ot_pay
+
+            vat = gross * 0.12
+            ph = gross * 0.05
+            sss = gross * 0.04
+            pag = gross * 0.02
+            
+            attendance_deduct = 0 
+            
+            net = gross - (vat + ph + sss + pag + attendance_deduct)
+
+            self.master.salary_records.add_record(emp.id, emp.name, net)
+            
+            return net
+
+        except Exception as e:
+            print(f"Error processing {emp.name}: {e}")
+            return 0
+
+
+    def add_to_processing_queue(self):
+        query = self.search_id_entry.get().strip()
+        emp = self.master.payroll_system.search_employee_by_id(query)
+        queue = self.master.payroll_queue
+        
+        if emp:
+            queue.enqueue(emp)
+            
+            count = queue.get_size()
+            self.queue_status_label.configure(text=f"Queue: {count} Employees")
+            
+            messagebox.showinfo("Queue", f"{emp.name} added to the line.")
+        else:
+            messagebox.showerror("Error", "Search for an employee first!")
+
+    def process_entire_queue(self):
+        queue = self.master.payroll_queue
+        
+        if queue.get_size() == 0:
+            messagebox.showwarning("Empty", "There is no one in the queue to process.")
+            return
+
+        summary = "Batch Processing Results:\n"
+        
+        while not queue.get_size() == 0:
+            emp = queue.dequeue()
+            net_pay = self.auto_compute_for_queue(emp)
+            summary += f"- {emp.name}: Paid ₱{net_pay:,.2f}\n"
+
+        self.queue_status_label.configure(text="Queue: 0 Employees")
+
+        messagebox.showinfo("Queue Processed", summary)
+        self.master.salary_records.display_all() #
+
+    def set_current_datetime(self):
+        now = datetime.datetime.now().strftime("%B %d, %Y")
+        
+        self.date_entry.configure(state="normal")
+        self.date_entry.delete(0, "end")
+        self.date_entry.insert(0, now)
+        self.date_entry.configure(state="readonly")
+
+    def handle_search(self):
+        """Logic to search for employee by ID and fill the fields."""
+        query = self.search_id_entry.get().strip()
+        emp = self.master.payroll_system.search_employee_by_id(query)
+        
+        if emp:
+            fields_to_update = [
+                (self.name_entry, emp.name),
+                (self.gender_entry, emp.gender),
+                (self.dept_entry, emp.department),
+                (self.pos_entry, emp.position),
+                (self.emp_type_entry, emp.emp_type)
+            ]
+
+            for entry, value in fields_to_update:
+                entry.configure(state="normal")
+                entry.delete(0, "end")
+                entry.insert(0, value)
+                entry.configure(state="readonly")
+
+            self.set_current_datetime()
+
+            if emp.emp_type == "Full-Time":
+                self.rate_label.grid_remove()
+                self.rate_entry.grid_remove()
+                self.hours_label.grid_remove()
+                self.hours_entry.grid_remove()
+                
+                self.monthly_salary_label.grid(row=2, column=0, padx=20, pady=10, sticky="w")
+                self.monthly_salary_entry.grid(row=2, column=1, sticky="w")
+                self.monthly_salary_entry.delete(0, "end")
+                self.monthly_salary_entry.insert(0, str(emp.get_salary())) #
+                
+            else:
+                self.monthly_salary_label.grid_remove()
+                self.monthly_salary_entry.grid_remove()
+                
+                self.rate_label.grid(row=2, column=0, padx=20, pady=10, sticky="w")
+                self.rate_entry.grid(row=2, column=1, sticky="w")
+                self.hours_label.grid(row=3, column=0, padx=20, pady=10, sticky="w")
+                self.hours_entry.grid(row=3, column=1, sticky="w")
+                
+                self.rate_entry.delete(0, "end")
+                self.hours_entry.delete(0, "end")
+
+                self.rate_entry.insert(0, str(emp.hourly_rate))
+                self.hours_entry.insert(0, str(emp.hours_worked))
+                self.rate_entry.configure(state="readonly")
+        else:
+            messagebox.showerror("Error", "Employee Not Found")
+
+    def compute_payroll(self):
+        try:
+            emp_type = self.emp_type_entry.get()
+            total_days = float(self.total_days_entry.get())
+            days_present = float(self.days_present_entry.get())
+
+            if emp_type == "Full-Time":
+                gross_monthly = float(self.monthly_salary_entry.get())
+                reg_pay = gross_monthly 
+                ot_pay = 0 
+                gross = reg_pay + ot_pay
+            else:
+                rate = float(self.rate_entry.get())
+                hours = float(self.hours_entry.get())
+                reg_hours = min(hours, 40)
+                ot_hours = max(0, hours - 40)
+                reg_pay = reg_hours * rate
+                ot_pay = ot_hours * (rate * 1.5)
+                gross = reg_pay + ot_pay
+
+            #Deduction
+            vat_amount = gross * 0.12
+            philhealth_amount = gross * 0.05
+            sss_amount = gross * 0.04
+            pagibig_amount = gross * 0.02
+            
+            # Attendance Deduction
+            absent_days = max(0, total_days - days_present)
+            attendance_deduction = (gross / total_days) * absent_days if total_days > 0 else 0
+
+            # Total Calculation
+            total_statutory = vat_amount + philhealth_amount + sss_amount + pagibig_amount
+            total_all_deductions = total_statutory + attendance_deduction
+            net_salary = gross - total_all_deductions
+
+            self.display_payslip(
+                reg_pay, ot_pay, gross, 
+                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
+                attendance_deduction, net_salary
+            )
+
+        except ValueError:
+            messagebox.showerror("Error", "Please ensure all numeric fields are filled correctly.")
+
+    def display_payslip(self, reg, ot, gross, vat, ph, sss, pag, absent, net):
+        query = self.search_id_entry.get().strip()
+        emp = self.master.payroll_system.search_employee_by_id(query)
+        name = self.name_entry.get()
+        dept = self.dept_entry.get()
+        pos = self.pos_entry.get()
+        emp_type = self.emp_type_entry.get()
+        current_date = self.date_entry.get()
+        
+        slip_toplevel = ctk.CTkToplevel(self.master)
+        slip_toplevel.withdraw() 
+        slip_toplevel.title("Official Salary Slip")
+        slip_toplevel.geometry("900x750")
+        slip_toplevel.resizable(False, False)
+        slip_toplevel.configure(fg_color="white")
+
+        # Light Green Banner
+        banner = ctk.CTkFrame(slip_toplevel, fg_color="#c2f0d1", corner_radius=0, height=40)
+        banner.pack(fill="x", side="top")
+        ctk.CTkLabel(banner, text="Payroll Management System for Employees", text_color="black").pack(pady=5)
+
+        container = ctk.CTkFrame(slip_toplevel, fg_color="white")
+        container.pack(expand=True, fill="both", padx=40, pady=20)
+
+        # Header Title
+        ctk.CTkLabel(container, text=f"SALARY SLIP FOR {datetime.datetime.now().strftime('%B %Y').upper()}", 
+                    text_color="black", font=("Helvetica", 24, "bold")).pack()
+        ctk.CTkFrame(container, height=2, fg_color="black").pack(fill="x", pady=10)
+
+        # --- SECTION 1: TOP GRID (INFO & EARNINGS) ---
+        top_grid = ctk.CTkFrame(container, fg_color="transparent")
+        top_grid.pack(fill="x", pady=10)
+
+        # Left: Info
+        left_box = ctk.CTkFrame(top_grid, fg_color="transparent")
+        left_box.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
+        ctk.CTkLabel(left_box, text="EMPLOYEE INFORMATION", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        self._create_slip_row(left_box, "EMPLOYEE NAME", name)
+        self._create_slip_row(left_box, "EMPLOYEE ID", self.search_id_entry.get())
+        self._create_slip_row(left_box, "WORK POSITION", pos)
+        self._create_slip_row(left_box, "DEPARTMENT", dept)
+
+        # Right: Earnings
+        right_box = ctk.CTkFrame(top_grid, fg_color="transparent")
+        right_box.pack(side="right", anchor="n", expand=True, fill="x")
+        ctk.CTkLabel(right_box, text="SALARY DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        if emp_type == "Part-Time":
+            self._create_slip_row(right_box, "HOURLY RATE", f"Php {emp.hourly_rate:,.2f}")
+            self._create_slip_row(right_box, "HOURS WORKED", f"{self.hours_entry.get()} hrs")
+        self._create_slip_row(right_box, "REGULAR PAY", f"Php {reg:,.2f}")
+        self._create_slip_row(right_box, "OVERTIME", f"Php {ot:,.2f}")
+        self._create_slip_row(right_box, "GROSS SALARY", f"Php {gross:,.2f}")
+
+        # --- SECTION 2: MID GRID (DEDUCTIONS & ADDITIONAL) ---
+        mid_grid = ctk.CTkFrame(container, fg_color="transparent")
+        mid_grid.pack(fill="x", pady=20)
+
+        # Left Bottom: Deductions
+        deduct_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
+        deduct_container.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
+        ctk.CTkLabel(deduct_container, text="DEDUCTIONS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        self._create_slip_row(deduct_container, "VAT (12%)", f"Php {vat:,.2f}")
+        self._create_slip_row(deduct_container, "PHILHEALTH (5%)", f"Php {ph:,.2f}")
+        self._create_slip_row(deduct_container, "SSS (4%)", f"Php {sss:,.2f}")
+        self._create_slip_row(deduct_container, "PAG-IBIG (2%)", f"Php {pag:,.2f}")
+        self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {absent:,.2f}")
+        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {vat+ph+sss+pag+absent:,.2f}")
+
+        # Right Bottom: Additional Details
+        additional_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
+        additional_container.pack(side="right", anchor="n", expand=True, fill="x")
+        ctk.CTkLabel(additional_container, text="ADDITIONAL DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        
+        end_date = datetime.datetime.now() + datetime.timedelta(days=30)
+        self._create_slip_row(additional_container, "PAYMENT DATE", current_date)
+        self._create_slip_row(additional_container, "PAY PERIOD", f"{current_date} - {end_date.strftime('%b %d, %Y')}")
+        self._create_slip_row(additional_container, "JOIN DATE", f"{emp.hire_date}")
+
+        # --- SECTION 3: FOOTER (NET SALARY) ---
+        footer_spacer = ctk.CTkFrame(container, fg_color="transparent", height=40)
+        footer_spacer.pack(fill="x")
+
+        net_box = ctk.CTkFrame(container, fg_color="#90ee90", border_color="black", border_width=2, corner_radius=0)
+        net_box.pack(side="right", pady=(20, 10))
+        
+        ctk.CTkLabel(net_box, text="NET SALARY RECEIVED", text_color="black", 
+                    font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
+        ctk.CTkLabel(net_box, text=f"Php {net:,.2f}", text_color="black", 
+                    font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
+        
+        slip_toplevel.deiconify()
+        slip_toplevel.attributes("-topmost", True)
+        slip_toplevel.focus_force()
+
+    def _create_slip_row(self, parent, label_text, value_text):
+        """Creates a clean, explicit row with label and value aligned to ends."""
+        row = ctk.CTkFrame(parent, fg_color="white", border_color="black", border_width=1, corner_radius=0)
+        row.pack(fill="x")
+        
+        ctk.CTkLabel(row, text=label_text, text_color="black", font=("Helvetica", 11), 
+                    width=140, anchor="w", padx=10).pack(side="left", pady=2)
+        
+        ctk.CTkLabel(row, text=value_text, text_color="black", font=("Helvetica", 11, "bold"), 
+                    anchor="e", padx=10).pack(side="right", fill="x", expand=True, pady=2)
+        
+class PayrollSystemApp(ctk.CTk):
+    def __init__(self, screenWidth=1280, screenHeight=720):
+        super().__init__()
+
+        self.payroll_system = PayrollSystemManager()
+        self.payroll_queue = PayrollQueue()
+        self.sorter = PayrollAlgo()
+        self.salary_records = SalaryRecord()
+        self.file_handler = PayrollDataFileHandling()
+
+        ctk.set_appearance_mode("light")
+
+        self.title("Payroll Management System For Employees")
+        self.geometry(f"{screenWidth}x{screenHeight}")
+        self.resizable(False, False)
+        self.primary_font = ctk.CTkFont(family="Helvetica", size=18)
+        self.protocol("WM_DELETE_WINDOW", self.exit)
+
+        self.auth_user = None
+        self.current_frame = None
+        print("Current Frame: ", self.current_frame)
+        self.show_admin_page()
+
+    def exit(self):
+        """Triggered when the user clicks the red X button"""
+        if messagebox.askokcancel("Quit", "Are you sure you want to exit the Payroll System? Any unsaved changes may be lost."):
+            self.destroy()
+    
+    def show_admin_page(self):
+        self.current_frame = AdminLoginFrame(self, self.show_home_page)
+        self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
+        print("Current Frame: ", self.current_frame)
+
+    def show_home_page(self, username):
+
+        self.auth_user = username
+
+        if self.current_frame:
+            self.current_frame.pack_forget()
+            self.current_frame.place_forget()
+
+        self.current_frame.place_forget()
+        self.current_frame = HomePageFrame(self, username=self.auth_user)
+        self.current_frame.pack(fill="both", expand=True)
+        print("Current Frame: ", self.current_frame)
+
+    def show_view_all_page(self):
+        """Hides current frame and shows the Employee List."""
+        if self.current_frame:
+            self.current_frame.pack_forget() 
+            self.current_frame.place_forget()
+
+        self.current_frame = ViewEmployeesFrame(self, on_back=self.show_home_after_view)
+        self.current_frame.pack(fill="both", expand=True)
+
+    def show_home_after_view(self):
+        """Callback to return to Home."""
+        self.current_frame.pack_forget()
+        self.show_home_page(username=self.auth_user) 
+
+    def handle_logout(self):
+        """Clears session data and returns to the login page."""
+        if messagebox.askyesno("Logout", "Are you sure you want to log out?"):
+            self.auth_user = None 
+            if self.current_frame:
+                self.current_frame.pack_forget()
+                self.current_frame.place_forget()
+            
+            self.show_admin_page()
+    
+    def show_process_page(self):
+        """Hides current frame and shows the Process Employee Page."""
+        if self.current_frame:
+            self.current_frame.pack_forget()
+            self.current_frame.place_forget()
+        
+        self.current_frame = ProcessEmployeeFrame(self)
+        self.current_frame.pack(fill="both", expand=True)
+
+
+        
+if __name__ == "__main__":
+    app = PayrollSystemApp()
+    app.mainloop()
