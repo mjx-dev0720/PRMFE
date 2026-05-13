@@ -9,3 +9,4 @@
 1008|Darren Espanto|Male|Human Resources|Compensation Analyst|May 14, 2026|darreng@g.com|2352-6457-5747|Part-Time|21600.0|40.0|540.0
 1011|JunJun Mendoza|Male|Support & Operations|UI/UX Developer|May 14, 2026|junjunm@g.com|3294-3256-5747|Full-Time|45240.0|0|0
 1012|Rowie Montero|Male|IT Infrastructure & Cloud|IT Helpdesk|May 14, 2026|rowrowmon@g.com|3056-6346-3462|Part-Time|15500.0|50.0|310.0
+10|Manager John|Male|Admin|Chief|2026|john@corp.com|777|Full-Time|90000.0|0|0
