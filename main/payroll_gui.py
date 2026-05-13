@@ -1026,53 +1026,37 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.total_days_entry.insert(0, "22")
         self.total_days_entry.configure(state="readonly")
 
-        ctk.CTkLabel(self.right_panel, text="Days Present:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=20, pady=10, sticky="w")
-        self.days_present_entry = ctk.CTkEntry(self.right_panel, width=150)
-        self.days_present_entry.grid(row=5, column=1, sticky="w")
+        ctk.CTkLabel(self.right_panel, text="Absenses:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=20, pady=10, sticky="w")
+        self.absent_entry = ctk.CTkEntry(self.right_panel, width=150)
+        self.absent_entry.grid(row=5, column=1, sticky="w")
 
         self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, width=120, fg_color="#12E068", 
                                         text_color="black", font=self.primary_font, command=self.compute_payroll)
-        self.compute_btn.grid(row=6, column=0, columnspan=2, pady=30, padx=20, sticky="ew")
+        self.compute_btn.grid(row=6, column=0, columnspan=2, pady=30, padx=5, sticky="ew")
+
+        self.add_queue_btn = ctk.CTkButton(
+                                        self.right_panel, 
+                                        text="Add to Batch Queue", 
+                                        command=self.add_to_pay_queue,
+                                        font=("Helvetica", 14),
+                                        fg_color="#e67e22",  # Distinct orange color to separate it from individual generation
+                                        hover_color="#d35400"
+                                    )
+        self.add_queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
         self.queue_status_label = ctk.CTkLabel(self.right_panel, text="Queue: 0 Employees", text_color="blue")
-        self.queue_status_label.grid(row=8, column=0, columnspan=2, pady=5)
+        self.queue_status_label.grid(row=7, column=3, columnspan=2, pady=5)
 
         self.bulk_queue_btn = ctk.CTkButton(self.right_panel, text="ENQUEUE ALL EMPLOYEES", height=45, width=120,
                                             fg_color="#3a7ebf", text_color="white", 
                                             command=self.bulk_enqueue_all)
-        self.bulk_queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
+        self.bulk_queue_btn.grid(row=8, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
-        ctk.CTkButton(self.right_panel, text="Get All Slip", command=self.process_and_display_all_queued).grid(row=8, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
+        ctk.CTkButton(self.right_panel, text="Get All Slip", command=self.process_and_display_all_queued).grid(row=8, column=3, pady=10, padx=10, sticky="ew")
 
         ctk.CTkButton(self, text="BACK", fg_color="red", width=100, height=40, font=self.primary_font,
                     command=lambda: self.master.show_home_page(self.master.auth_user)).pack(pady=10)
         
-    def auto_compute_for_queue(self, emp):
-        """Processes payroll for an employee object without manual input."""
-        try:
-            if emp.emp_type == "Full-Time":
-                gross = emp.get_salary()
-            else:
-                rate = getattr(emp, 'hourly_rate', 0)
-                hours = getattr(emp, 'hours_worked', 0)
-                reg_pay = min(hours, 40) * rate
-                ot_pay = max(0, hours - 40) * (rate * 1.5)
-                gross = reg_pay + ot_pay
-
-            vat = gross * 0.12
-            ph = gross * 0.05
-            sss = gross * 0.04
-            pag = gross * 0.02
-            
-            attendance_deduct = 0 
-            
-            net = gross - (vat + ph + sss + pag + attendance_deduct)
-            
-            return net
-
-        except Exception as e:
-            print(f"Error processing {emp.name}: {e}")
-            return 0
         
     def bulk_enqueue_all(self):
         """Loads all active employees from the system manager directly into the FIFO pipeline."""
@@ -1093,40 +1077,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         # Immediately refresh status labels
         self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
         messagebox.showinfo("Success", f"Successfully loaded {counter} employees into the Pay-Run sequence!")
-
-    def process_entire_queue(self):
-        """Executes FIFO dequeue operations and channels transaction records through the file handling data layer."""
-        queue = self.master.payroll_queue
-        
-        if queue.get_size() == 0:
-            messagebox.showwarning("Empty Queue", "There are no pending employee entries in the pay-run block.")
-            return
-
-        summary = f"=== BATCH PAY-RUN RECORD ({datetime.datetime.now().strftime('%M:%S')}) ===\n"
-        processed_count = 0
-        
-        # Access the centralized file handler from the app framework layer
-        db_handler = self.master.file_handler  # explicitly calling PayrollDataFileHandling instance
-
-        while not queue.is_empty():
-            emp = queue.dequeue()
-            net_pay = self.auto_compute_for_queue(emp)
-            
-            # 1. Update the custom Linked List history structure in memory
-            self.master.salary_records.add_record(emp.id, emp.name, net_pay)
-            
-            # 2. delegate storage persistence entirely to db_handling.py
-            db_handler.log_pay_run_transaction(emp.id, emp.name, emp.emp_type, net_pay)
-            
-            summary += f"✔ ID {emp.id} - {emp.name}: Paid ₱{net_pay:,.2f}\n"
-            processed_count += 1
-
-        # Reset UI structural counters
-        self.queue_status_label.configure(text="Queue: 0 Employees")
-
-        # Display transaction metrics window
-        messagebox.showinfo("Pay-Run Complete", f"Successfully processed {processed_count} disbursements!\n\n{summary}")
-        self.master.salary_records.display_all()
 
     def set_current_datetime(self):
         now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -1189,77 +1139,109 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         else:
             messagebox.showerror("Error", "Employee Not Found")
 
-    def compute_payroll(self):
-        try:
-            emp_type = self.emp_type_entry.get()
-            total_days = float(self.total_days_entry.get())
-            days_present = float(self.days_present_entry.get())
+    def add_to_pay_queue(self):
+        """Captures current screen state parameters, includes absences metrics, and stages the worker to the batch queue."""
+        # 1. Fetch target ID using your active entry variable name (from our previous fix)
+        target_id = self.search_id_entry.get().strip() 
+        if not target_id:
+            messagebox.showwarning("Input Error", "Please provide a valid Employee ID to stage for batch processing.")
+            return
 
-            if emp_type == "Full-Time":
-                gross_monthly = float(self.monthly_salary_entry.get())
-                reg_pay = gross_monthly 
-                ot_pay = 0 
-                gross = reg_pay + ot_pay
-            else:
-                rate = float(self.rate_entry.get())
-                hours = float(self.hours_entry.get())
-                reg_hours = min(hours, 40)
-                ot_hours = max(0, hours - 40)
-                reg_pay = reg_hours * rate
-                ot_pay = ot_hours * (rate * 1.5)
-                gross = reg_pay + ot_pay
+        # 2. Fetch the worker reference from core system memory
+        emp = self.master.payroll_system.search_employee_by_id(target_id)
+        if not emp:
+            messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
+            return
 
-            #Deduction
-            vat_amount = gross * 0.12
-            philhealth_amount = gross * 0.05
-            sss_amount = gross * 0.04
-            pagibig_amount = gross * 0.02
+        # 3. Read and parse the absences entry box input cleanly
+        absences_input = 0.0
+        if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
+            try:
+                absences_input = float(self.absent_entry.get().strip())
+            except ValueError:
+                messagebox.showerror("Typing Error", "Absences field must contain a valid number or remain empty.")
+                return
+
+        # 4. Bind the active absences amount to this employee object session wrapper
+        # This guarantees that when the queue pops the record later, the math remembers these absences!
+        emp.staged_absences = absences_input
+
+        # 5. Push the configured instance onto your central FIFO algorithm data structure queue
+        self.master.payroll_queue.enqueue(emp)
+
+        # 6. Inform the user and clear out inputs for the next employee search entry
+        messagebox.showinfo("Queue Success", f"Employee {emp.name} (ID: {emp.id}) with {absences_input} absences has been staged in the batch run queue.")
+        
+        # Optional: Reset entry inputs automatically so the admin can type the next ID immediately
+        self.search_id_entry.delete(0, 'end')
+        if hasattr(self, 'absent_entry'):
+            self.absent_entry.delete(0, 'end')
             
-            # Attendance Deduction
-            absent_days = max(0, total_days - days_present)
-            attendance_deduction = (gross / total_days) * absent_days if total_days > 0 else 0
+        # Update your queue layout metrics tracker label on your screen dashboard if you have one
+        if hasattr(self, 'queue_status_label'):
+            queue_size = self.master.payroll_queue.get_size()
+            self.queue_status_label.configure(text=f"Queue: {queue_size} Employees")
 
-            # Total Calculation
-            total_statutory = vat_amount + philhealth_amount + sss_amount + pagibig_amount
-            total_all_deductions = total_statutory + attendance_deduction
-            net_salary = gross - total_all_deductions
+        
 
-            emp_id = self.search_id_entry.get().strip()
-            name = self.name_entry.get()
-            dept = self.dept_entry.get()
-            pos = self.pos_entry.get()
-            current_date = self.date_entry.get()
+    def compute_payroll(self):
+        """Computes Singe Payroll"""
+        import datetime
+        try:
+            target_id = self.search_id_entry.get().strip()
+            if not target_id:
+                messagebox.showwarning("Input Error", "Please provide a valid Employee ID to run payroll calculations.")
+                return
+        
+            emp = self.master.payroll_system.search_employee_by_id(target_id)
+            if not emp:
+                messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
+                return
+
+            absences_input = 0
+            if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
+                try:
+                    absences_input = float(self.absent_entry.get().strip())
+                except ValueError:
+                    messagebox.showerror("Typing Error", "Absences field must contain a valid number.")
+                    return
+
+            current_date = datetime.datetime.now().strftime("%B %d, %Y")
+
+            hours_val = getattr(emp, 'hours_worked', None) if emp.emp_type == "Part-Time" else None
+            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_input)
+
 
             self.master.file_handler.save_salary_slip_record(
-                emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, 
-                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
-                attendance_deduction, net_salary, current_date
+            str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
+            pay_data["reg_pay"], pay_data["ot_pay"], pay_data["gross"],
+            pay_data["vat"], pay_data["ph"], pay_data["sss"], pay_data["pag"],
+            pay_data["absent"], pay_data["net"], current_date
             )
 
-            self.display_payslip(
-                reg_pay, ot_pay, gross, 
-                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
-                attendance_deduction, net_salary
-            )
+            self.master.salary_records.add_record(str(emp.id), emp.name, pay_data["net"])
+            if hasattr(self, 'gross_salary_entry'):
+                self.gross_salary_entry.delete(0, 'end')
+                self.gross_salary_entry.insert(0, f"{pay_data['gross']:.2f}")
+            
+            if hasattr(self, 'net_salary_entry'):
+                self.net_salary_entry.delete(0, 'end')
+                self.net_salary_entry.insert(0, f"{pay_data['net']:.2f}")
+
+            # 4. Trigger the visual slip window, passing the exact calculated tokens
+            self.display_payslip(emp, pay_data, current_date)
 
         except ValueError:
             messagebox.showerror("Error", "Please ensure all numeric fields are filled correctly.")
 
-    def display_payslip(self, reg, ot, gross, vat, ph, sss, pag, absent, net):
-        query = self.search_id_entry.get().strip()
-        emp = self.master.payroll_system.search_employee_by_id(query)
-        name = self.name_entry.get()
-        dept = self.dept_entry.get()
-        pos = self.pos_entry.get()
-        emp_type = self.emp_type_entry.get()
-        current_date = self.date_entry.get()
-        
+    def display_payslip(self, emp, pay_data, date_string):
         slip_toplevel = ctk.CTkToplevel(self.master)
         slip_toplevel.withdraw() 
-        slip_toplevel.title("Official Salary Slip")
+        slip_toplevel.title(f"Official Salary Slip for {emp.name}")
         slip_toplevel.geometry("900x750")
         slip_toplevel.resizable(False, False)
         slip_toplevel.configure(fg_color="white")
+        current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
         # Light Green Banner
         banner = ctk.CTkFrame(slip_toplevel, fg_color="#c2f0d1", corner_radius=0, height=40)
@@ -1282,21 +1264,21 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         left_box = ctk.CTkFrame(top_grid, fg_color="transparent")
         left_box.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
         ctk.CTkLabel(left_box, text="EMPLOYEE INFORMATION", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
-        self._create_slip_row(left_box, "EMPLOYEE NAME", name)
-        self._create_slip_row(left_box, "EMPLOYEE ID", self.search_id_entry.get())
-        self._create_slip_row(left_box, "WORK POSITION", pos)
-        self._create_slip_row(left_box, "DEPARTMENT", dept)
+        self._create_slip_row(left_box, "EMPLOYEE NAME", emp.name)
+        self._create_slip_row(left_box, "EMPLOYEE ID", emp.id)
+        self._create_slip_row(left_box, "WORK POSITION", emp.position)
+        self._create_slip_row(left_box, "DEPARTMENT", emp.department)
 
         # Right: Earnings
         right_box = ctk.CTkFrame(top_grid, fg_color="transparent")
         right_box.pack(side="right", anchor="n", expand=True, fill="x")
         ctk.CTkLabel(right_box, text="SALARY DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
-        if emp_type == "Part-Time":
+        if emp.emp_type == "Part-Time":
             self._create_slip_row(right_box, "HOURLY RATE", f"Php {emp.hourly_rate:,.2f}")
-            self._create_slip_row(right_box, "HOURS WORKED", f"{self.hours_entry.get()} hrs")
-        self._create_slip_row(right_box, "REGULAR PAY", f"Php {reg:,.2f}")
-        self._create_slip_row(right_box, "OVERTIME", f"Php {ot:,.2f}")
-        self._create_slip_row(right_box, "GROSS SALARY", f"Php {gross:,.2f}")
+            self._create_slip_row(right_box, "HOURS WORKED", f"{emp.hours_worked} hrs")
+        self._create_slip_row(right_box, "REGULAR PAY", f"Php {pay_data['reg_pay']:,.2f}")
+        self._create_slip_row(right_box, "OVERTIME", f"Php {pay_data['ot_pay']:,.2f}")
+        self._create_slip_row(right_box, "GROSS SALARY", f"Php {pay_data['gross']:,.2f}")
 
         # --- SECTION 2: MID GRID (DEDUCTIONS & ADDITIONAL) ---
         mid_grid = ctk.CTkFrame(container, fg_color="transparent")
@@ -1306,12 +1288,13 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         deduct_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
         deduct_container.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
         ctk.CTkLabel(deduct_container, text="DEDUCTIONS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
-        self._create_slip_row(deduct_container, "VAT (12%)", f"Php {vat:,.2f}")
-        self._create_slip_row(deduct_container, "PHILHEALTH (5%)", f"Php {ph:,.2f}")
-        self._create_slip_row(deduct_container, "SSS (4%)", f"Php {sss:,.2f}")
-        self._create_slip_row(deduct_container, "PAG-IBIG (2%)", f"Php {pag:,.2f}")
-        self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {absent:,.2f}")
-        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {vat+ph+sss+pag+absent:,.2f}")
+        self._create_slip_row(deduct_container, "VAT (12%)", f"Php {pay_data['vat']:,.2f}")
+        self._create_slip_row(deduct_container, "PHILHEALTH (5%)", f"Php {pay_data['ph']:,.2f}")
+        self._create_slip_row(deduct_container, "SSS (4%)", f"Php {pay_data['sss']:,.2f}")
+        self._create_slip_row(deduct_container, "PAG-IBIG (2%)", f"Php {pay_data['pag']:,.2f}")
+        self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {pay_data['absent']:,.2f}")
+        total_ded = pay_data['vat'] + pay_data['ph'] + pay_data['sss'] + pay_data['pag'] + pay_data['absent']
+        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {total_ded:,.2f}")
 
         # Right Bottom: Additional Details
         additional_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
@@ -1332,7 +1315,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         
         ctk.CTkLabel(net_box, text="NET SALARY RECEIVED", text_color="black", 
                     font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
-        ctk.CTkLabel(net_box, text=f"Php {net:,.2f}", text_color="black", 
+        ctk.CTkLabel(net_box, text=f"Php {pay_data['net']:,.2f}", text_color="black", 
                     font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
         
         slip_toplevel.deiconify()
@@ -1360,59 +1343,56 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             return
 
         processed_slips = []  # Keeps track of slips generated in this specific batch run
+        current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
         while not queue.is_empty():
             emp = queue.dequeue()
 
-            emp_id = str(emp.id)
-            name = emp.name
-            dept = emp.department
-            pos = emp.position
-            emp_type = emp.emp_type
-            current_date = datetime.datetime.now().strftime("%B %d, %Y")
-
-            # Calculations
-            if emp_type == "Full-Time":
-                gross_monthly = float(emp.get_salary()) if emp.get_salary() > 0 else 30000.0
-                reg_pay = gross_monthly
-                ot_pay = 0.0
-                gross = reg_pay + ot_pay
-            else:
-                rate = float(emp.hourly_rate) if hasattr(emp, 'hourly_rate') else 500.0
-                hours = float(emp.hours_worked) if hasattr(emp, 'hours_worked') else 40.0
-                reg_hours = min(hours, 40.0)
-                ot_hours = max(0.0, hours - 40.0)
-                reg_pay = reg_hours * rate
-                ot_pay = ot_hours * (rate * 1.5)
-                gross = reg_pay + ot_pay
-
-            vat_amount = gross * 0.12
-            philhealth_amount = gross * 0.05
-            sss_amount = gross * 0.04
-            pagibig_amount = gross * 0.02
-            attendance_deduction = 0.0
-
-            total_statutory = vat_amount + philhealth_amount + sss_amount + pagibig_amount
-            net_salary = gross - total_statutory
-
-            # 1. Save to historical text database ledger
+            absences_to_charge = getattr(emp, 'staged_absences', 0.0)
+            # If the employee is Part-Time, we fetch their hours dynamically
+            hours_val = getattr(emp, 'hours_worked', None) if emp.emp_type == "Part-Time" else None
+            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_to_charge)
+            
+            final_gross = pay_data["gross"]
+            final_absent = pay_data["absent"]
+            final_net = pay_data["net"]
+            
+            final_vat = pay_data["vat"]
+            final_ph = pay_data["ph"]
+            final_sss = pay_data["sss"]
+            final_pag = pay_data["pag"]
+            
+            # 1. Save directly to your text storage ledger
             self.master.file_handler.save_salary_slip_record(
-                emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, 
-                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
-                attendance_deduction, net_salary, current_date
+                str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
+                pay_data["reg_pay"], pay_data["ot_pay"], final_gross,
+                final_vat, final_ph, final_sss, final_pag,
+                final_absent, final_net, current_date
             )
 
             # 2. Sync to local runtime Linked List reporting structure
-            self.master.salary_records.add_record(emp_id, name, net_salary)
+            self.master.salary_records.add_record(str(emp.id), emp.name, final_net)
 
-            # 3. Cache the exact snapshot values into our local array for display
-            slip_snapshot = {
-                "date": current_date, "id": emp_id, "name": name, "dept": dept, "pos": pos,
-                "emp_type": emp_type, "reg_pay": reg_pay, "ot_pay": ot_pay, "gross": gross,
-                "vat": vat_amount, "ph": philhealth_amount, "sss": sss_amount, "pag": pagibig_amount,
-                "absent": attendance_deduction, "net": net_salary
-            }
-            processed_slips.append(slip_snapshot)
+            processed_slips.append({
+                "date": current_date, 
+                "id": str(emp.id), 
+                "name": emp.name, 
+                "dept": emp.department, 
+                "pos": emp.position, 
+                "emp_type": emp.emp_type, 
+                "reg_pay": pay_data["reg_pay"], 
+                "ot_pay": pay_data["ot_pay"], 
+                "gross": final_gross,
+                "vat": final_vat, 
+                "ph": final_ph, 
+                "sss": final_sss, 
+                "pag": final_pag,
+                "absent": final_absent, 
+                "net": final_net
+            })
+
+            if hasattr(emp, 'staged_absences'):
+                del emp.staged_absences
 
         if hasattr(self, 'queue_status_label'):
             self.queue_status_label.configure(text="Queue: 0 Employees")
@@ -1475,7 +1455,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             self._create_slip_row(money_frame, "REGULAR EARNINGS:", f"Php {slip['reg_pay']:,.2f}")
             self._create_slip_row(money_frame, "OVERTIME PAYMENTS:", f"Php {slip['ot_pay']:,.2f}")
             self._create_slip_row(money_frame, "GROSS BASE PAY:", f"Php {slip['gross']:,.2f}")
-            self._create_slip_row(money_frame, "STATUTORY DEDUCTIONS:", f"Php {(slip['vat'] + slip['ph'] + slip['sss'] + slip['pag']):,.2f}")
+            self._create_slip_row(money_frame, "STATUTORY DEDUCTIONS:", f"Php {(slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip["absent"]):,.2f}")
             
             # Net Cash Takehome Footer Panel
             net_box = ctk.CTkFrame(right_pane, fg_color="#90ee90", corner_radius=4)

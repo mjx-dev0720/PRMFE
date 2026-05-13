@@ -26,6 +26,55 @@ class Employee:
     def get_salary(self):
         return self.__salary
     
+    def calculate_payroll_breakdown(self, hours_override=None, absences_count=0):
+        """
+        Calculates itemized financial breakdowns. 
+        Returns a structured dictionary of figures rounded to 2 decimal places.
+        This isolates business math entirely from UI layers!
+        """
+        num_absences = float(absences_count) if absences_count else 0.0
+        if self.emp_type == "Full-Time":
+            base_salary = self.get_salary()
+            reg_pay = base_salary
+            ot_pay = 0.0
+
+            daily_rate = base_salary / 22.0
+            attendance_deduction = round(num_absences * daily_rate, 2)
+        else:
+            # For Part-Time, use hours_override if provided via processing queue
+            hours = float(hours_override) if hours_override is not None else getattr(self, 'hours_worked', 40.0)
+            rate = float(getattr(self, 'hourly_rate', 500.0))
+            
+            reg_hours = min(hours, 40.0)
+            ot_hours = max(0.0, hours - 40.0)
+            
+            reg_pay = reg_hours * rate
+            ot_pay = ot_hours * (rate * 1.5)
+
+            attendance_deduction = round(num_absences * (rate * 8.0), 2)
+        gross = reg_pay + ot_pay
+
+        # Deductions
+        vat = round(gross * 0.12, 2)
+        ph = round(gross * 0.05, 2)
+        sss = round(gross * 0.04, 2)
+        pag = round(gross * 0.02, 2)
+
+        total_deductions = vat + ph + sss + pag + attendance_deduction
+        net = round(gross - total_deductions, 2)
+
+        return {
+            "reg_pay": round(reg_pay, 2),
+            "ot_pay": round(ot_pay, 2),
+            "gross": round(gross, 2),
+            "vat": vat,
+            "ph": ph,
+            "sss": sss,
+            "pag": pag,
+            "absent": attendance_deduction,
+            "net": net
+        }
+    
 class PartTimeEmployee(Employee):
     def __init__(self, id, name, gender, department, position, hire_date , hours_worked, hourly_rate, email, bank_account):
         super().__init__(id, name, gender, department, position, hire_date, email, bank_account, "Part-Time")
