@@ -6,4 +6,4 @@
 7|Luffy|Male|Data & Security|Cybersecurity Analyst|May 05, 2026|luffy@g.com|1234-5369-8657|Full-Time|75000.0|0|0
 1001|Naruto Uzumaki|Male|Data & Security|Cybersecurity Analyst|May 11, 2026|lanoire@g.com|2394-2342-3254|Full-Time|75000.0|0|0
 1002|Ceelo Green|Male|Support & Operations|Technical Support Lead|May 11, 2026|cellogren@g.com|2334-3242-3245|Part-Time|21000.0|60.0|350.0
-1003|Julius Babaw|Male|Human Resources|Recruiter|May 13, 2026|j.@gm.com|2342-3424-3525|Part-Time|19250.0|55.0|350.0
+1004|Marc Justine De Vera|Male|IT Infrastructure & Cloud|Cloud Architect|May 13, 2026|marcjustdv@g.com|2344-2342-2356|Part-Time|33250.0|35.0|950.0

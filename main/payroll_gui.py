@@ -241,6 +241,14 @@ class HomePageFrame(ctk.CTkFrame):
             )
         view_all_lbl.pack(side="right", padx=20)
         view_all_lbl.bind("<Button-1>", lambda e: self.master.show_view_all_page())
+        view_records_lbl = ctk.CTkLabel(self, 
+            text="View All Transaction History", 
+            font=self.primary_font, 
+            text_color="blue", 
+            cursor="hand2"    
+            )
+        view_records_lbl.pack(side="right", padx=20)
+        view_records_lbl.bind("<Button-1>", lambda e: self.master.show_salary_records_page())
         
     def open_create_employee_win(self):
         self.create_emp = ctk.CTkToplevel(self.winfo_toplevel())
@@ -1480,7 +1488,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         scroll_container.pack(fill="both", expand=True, padx=5, pady=5)
 
         for slip in slips_list:
-            btn_text = f"{slip['id']} - {slip['name']}"
+            btn_text = f"{slip['date']} - {slip['name']}"
             btn = ctk.CTkButton(
                 scroll_container, 
                 text=btn_text, 
@@ -1495,6 +1503,101 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         # Automatically open the details page for the very first employee in the list initially
         if slips_list:
             populate_slip_details(slips_list[0])
+
+class ViewSalaryRecordsFrame(ctk.CTkFrame):
+    def __init__(self, master, on_back):
+        super().__init__(master, fg_color="#f5f5f5")
+        self.master = master
+        self.on_back = on_back
+
+        # Top Header Banner
+        banner = ctk.CTkFrame(self, fg_color="#c2f0d1", height=60, corner_radius=0)
+        banner.pack(fill="x", side="top")
+        
+        ctk.CTkLabel(banner, text="HISTORICAL SALARY TRANSACTION LEDGER", 
+                    text_color="black", font=("Helvetica", 20, "bold")).pack(side="left", padx=20, pady=15)
+        
+        ctk.CTkButton(banner, text="Back to Dashboard", fg_color="#333333", hover_color="#555555",
+                      command=self.on_back).pack(side="right", padx=20, pady=15)
+
+        # Control panel for Searching
+        control_panel = ctk.CTkFrame(self, fg_color="white", height=60, corner_radius=4)
+        control_panel.pack(fill="x", padx=20, pady=(15, 0))
+        
+        ctk.CTkLabel(control_panel, text="Search Employee ID:", text_color="black", 
+                    font=("Helvetica", 13, "bold")).pack(side="left", padx=(15, 5), pady=15)
+        
+        self.search_entry = ctk.CTkEntry(control_panel, placeholder_text="e.g., 1001", width=150, text_color="black")
+        self.search_entry.pack(side="left", padx=5, pady=15)
+        self.search_entry.bind("<KeyRelease>", lambda e: self.load_records_table())
+
+        # Main Scrollable Data Container
+        self.table_container = ctk.CTkScrollableFrame(self, fg_color="white", label_text="Issued Payslip Ledger Matrix")
+        self.table_container.configure(label_text_color="black", label_font=("Helvetica", 14, "bold"))
+        self.table_container.pack(fill="both", expand=True, padx=20, pady=15)
+
+        # Build headers and load data matrix
+        self.load_records_table()
+
+    def load_records_table(self):
+        """Clears old rows and reads database dictionaries to populate historical listings."""
+        # Clear previous items
+        for widget in self.table_container.winfo_children():
+            widget.destroy()
+
+        # Define Explicit Table Grid Column Metadata Headers
+        headers = ["Date", "ID", "Name", "Department", "Gross Pay", "Deductions", "Net Salary"]
+        widths = [120, 80, 180, 150, 120, 120, 120]
+
+        # Draw Header Row on Screen
+        header_row = ctk.CTkFrame(self.table_container, fg_color="#e0e0e0", corner_radius=0)
+        header_row.pack(fill="x", pady=(0, 5))
+
+        for col_idx, (text, w) in enumerate(zip(headers, widths)):
+            lbl = ctk.CTkLabel(header_row, text=text, width=w, font=("Helvetica", 12, "bold"), text_color="black", anchor="w")
+            lbl.pack(side="left", padx=10, pady=8)
+
+        # Pull raw token collection from database tier
+        all_slips = self.master.file_handler.get_all_salary_slips()
+        search_filter = self.search_entry.get().strip()
+
+        row_counter = 0
+
+        # Loop through dictionary mapping schemas
+        for emp_id, slips in all_slips.items():
+            # Apply search filter matching constraints dynamically
+            if search_filter and search_filter not in str(emp_id):
+                continue
+
+            for slip in slips:
+                # Alternate row highlight backgrounds for grid scanning readability
+                bg_color = "#fdfdfd" if row_counter % 2 == 0 else "#f1f3f5"
+                row_frame = ctk.CTkFrame(self.table_container, fg_color=bg_color, corner_radius=0)
+                row_frame.pack(fill="x", pady=1)
+
+                # Sum the structural deductions lines accurately 
+                total_deductions = slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip['absent']
+
+                # Format elements to display in the grid
+                data_fields = [
+                    slip['date'],
+                    emp_id,
+                    slip['name'],
+                    slip['dept'],
+                    f"Php {slip['gross']:,.2f}",
+                    f"Php {total_deductions:,.2f}",
+                    f"Php {slip['net']:,.2f}"
+                ]
+
+                for text, w in zip(data_fields, widths):
+                    val_lbl = ctk.CTkLabel(row_frame, text=text, width=w, text_color="black", font=("Helvetica", 12), anchor="w")
+                    val_lbl.pack(side="left", padx=10, pady=6)
+
+                row_counter += 1
+
+        if row_counter == 0:
+            ctk.CTkLabel(self.table_container, text="No payroll transactions found matching criteria.", 
+                        text_color="gray", font=("Helvetica", 13, "italic")).pack(pady=30)
         
 class PayrollSystemApp(ctk.CTk):
     def __init__(self, screenWidth=1280, screenHeight=720):
@@ -1574,6 +1677,21 @@ class PayrollSystemApp(ctk.CTk):
         
         self.current_frame = ProcessEmployeeFrame(self)
         self.current_frame.pack(fill="both", expand=True)
+
+    def show_salary_records_page(self):
+        """Hides current frame context and exposes the historical transactions ledger."""
+        if self.current_frame:
+            self.current_frame.pack_forget()
+            self.current_frame.place_forget()
+
+        # Route viewport frame execution context
+        self.current_frame = ViewSalaryRecordsFrame(self, on_back=self.show_home_after_salary_records)
+        self.current_frame.pack(fill="both", expand=True)
+
+    def show_home_after_salary_records(self):
+        """Callback reference clearing view stack state returning directly to user workspace dashboard."""
+        self.current_frame.pack_forget()
+        self.show_home_page(username=self.auth_user)
 
 
         

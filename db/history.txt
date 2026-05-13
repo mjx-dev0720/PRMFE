@@ -1,6 +1,4 @@
 May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|31818.18|22081.82
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
 May 13, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
 May 13, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
 May 13, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|IT Helpdesk|Full-Time|25000.00|0.00|25000.00|3000.00|1250.00|1000.00|500.00|0.00|19250.00
@@ -8,41 +6,4 @@ May 13, 2026|6|Rihanna|Human Resources|Training Specialist|Part-Time|16000.00|78
 May 13, 2026|7|Luffy|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
 May 13, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
 May 13, 2026|1002|Ceelo Green|Support & Operations|Technical Support Lead|Part-Time|14000.00|10500.00|24500.00|2940.00|1225.00|980.00|490.00|0.00|18865.00
-May 13, 2026|1003|Julius Babaw|Human Resources|Recruiter|Part-Time|14000.00|7875.00|21875.00|2625.00|1093.75|875.00|437.50|0.00|16843.75
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
-May 13, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
-May 13, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
-May 13, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|IT Helpdesk|Full-Time|25000.00|0.00|25000.00|3000.00|1250.00|1000.00|500.00|0.00|19250.00
-May 13, 2026|6|Rihanna|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
-May 13, 2026|7|Luffy|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1002|Ceelo Green|Support & Operations|Technical Support Lead|Part-Time|14000.00|10500.00|24500.00|2940.00|1225.00|980.00|490.00|0.00|18865.00
-May 13, 2026|1003|Julius Babaw|Human Resources|Recruiter|Part-Time|14000.00|7875.00|21875.00|2625.00|1093.75|875.00|437.50|0.00|16843.75
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
-May 13, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
-May 13, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
-May 13, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|IT Helpdesk|Full-Time|25000.00|0.00|25000.00|3000.00|1250.00|1000.00|500.00|0.00|19250.00
-May 13, 2026|6|Rihanna|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
-May 13, 2026|7|Luffy|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1002|Ceelo Green|Support & Operations|Technical Support Lead|Part-Time|14000.00|10500.00|24500.00|2940.00|1225.00|980.00|490.00|0.00|18865.00
-May 13, 2026|1003|Julius Babaw|Human Resources|Recruiter|Part-Time|14000.00|7875.00|21875.00|2625.00|1093.75|875.00|437.50|0.00|16843.75
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|63636.36|-9736.36
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
-May 13, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
-May 13, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
-May 13, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|IT Helpdesk|Full-Time|25000.00|0.00|25000.00|3000.00|1250.00|1000.00|500.00|0.00|19250.00
-May 13, 2026|6|Rihanna|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
-May 13, 2026|7|Luffy|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1002|Ceelo Green|Support & Operations|Technical Support Lead|Part-Time|14000.00|10500.00|24500.00|2940.00|1225.00|980.00|490.00|0.00|18865.00
-May 13, 2026|1003|Julius Babaw|Human Resources|Recruiter|Part-Time|14000.00|7875.00|21875.00|2625.00|1093.75|875.00|437.50|0.00|16843.75
-May 13, 2026|1|Marc Jay Sumayaw|Engineering & Development|DevOps Engineer|Full-Time|70000.00|0.00|70000.00|8400.00|3500.00|2800.00|1400.00|0.00|53900.00
-May 13, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
-May 13, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
-May 13, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|IT Helpdesk|Full-Time|25000.00|0.00|25000.00|3000.00|1250.00|1000.00|500.00|0.00|19250.00
-May 13, 2026|6|Rihanna|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
-May 13, 2026|7|Luffy|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
-May 13, 2026|1002|Ceelo Green|Support & Operations|Technical Support Lead|Part-Time|14000.00|10500.00|24500.00|2940.00|1225.00|980.00|490.00|0.00|18865.00
-May 13, 2026|1003|Julius Babaw|Human Resources|Recruiter|Part-Time|14000.00|7875.00|21875.00|2625.00|1093.75|875.00|437.50|0.00|16843.75
+May 13, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
