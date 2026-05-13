@@ -187,12 +187,32 @@ class HomePageFrame(ctk.CTkFrame):
                                     font=self.primary_font,
                                     command=self.open_search_employee_win
                                     )
-        search_btn.grid(row=3, column=0, padx=(0,20), pady=(5, 50))
+        search_btn.grid(row=3, column=0, padx=(0,20), pady=5)
         ctk.CTkLabel(btn_frame, 
                     text="Search EMPLOYEE", 
                     font=self.primary_font, 
                     text_color="black"
-                    ).grid(row=3, column=1, padx=5, pady=(5,50))
+                    ).grid(row=3, column=1, padx=5, pady=5)
+        
+        edit_btn = ctk.CTkButton(btn_frame, 
+                                    text="Edit/Update", 
+                                    height=65, 
+                                    width=150, 
+                                    fg_color="transparent", 
+                                    text_color="black", 
+                                    border_width=3, 
+                                    border_color="black", 
+                                    hover_color="#12E068", 
+                                    command=self.open_edit_employee_win,
+                                    font=self.primary_font
+                                    )
+        edit_btn.grid(row=4, column=0, padx=(0,20), pady=(5,50))
+
+        ctk.CTkLabel(btn_frame, 
+                    text="Edit/Update EMPLOYEE", 
+                    font=self.primary_font, 
+                    text_color="black"
+                    ).grid(row=4, column=1, padx=5, pady=(5, 50))
 
         process_btn = ctk.CTkButton(btn_frame, 
                                     text="Process", 
@@ -206,12 +226,12 @@ class HomePageFrame(ctk.CTkFrame):
                                     font=self.primary_font,
                                     command=self.master.show_process_page
                                     )
-        process_btn.grid(row=4, column=0, padx=(0,20), pady=5)
+        process_btn.grid(row=5, column=0, padx=(0,20), pady=5)
         ctk.CTkLabel(btn_frame, 
                     text="Process EMPLOYEE", 
                     font=self.primary_font, 
                     text_color="black"
-                    ).grid(row=4, column=1, padx=5, pady=5)
+                    ).grid(row=5, column=1, padx=5, pady=5)
 
         view_all_lbl = ctk.CTkLabel(self, 
             text="View All Employees", 
@@ -628,6 +648,188 @@ class HomePageFrame(ctk.CTkFrame):
         else:
             messagebox.showerror("Not Found", f"No employee found matching '{query}'.")
             self.search_win.lift()
+
+    def open_edit_employee_win(self):
+        """Prompts for an Employee ID, searches for it, and opens an identical window to edit records."""
+        # 1. Ask for Employee ID
+        self.edit_prompt_win = ctk.CTkToplevel(self.winfo_toplevel())
+        self.edit_prompt_win.title("Edit Employee Lookup")
+        self.edit_prompt_win.geometry("380x180")
+        self.edit_prompt_win.attributes("-topmost", True)
+        self.edit_prompt_win.resizable(False, False)
+
+        ctk.CTkLabel(self.edit_prompt_win, text="Enter Employee ID to Edit:", font=self.primary_font).pack(pady=15)
+        self.edit_id_lookup_entry = ctk.CTkEntry(self.edit_prompt_win, width=200)
+        self.edit_id_lookup_entry.pack(pady=5)
+        self.edit_id_lookup_entry.focus()
+
+        def submit_lookup():
+            target_id = self.edit_id_lookup_entry.get().strip()
+            manager = self.master.payroll_system
+            employee_obj = manager.search_employee_by_id(target_id)
+
+            if not employee_obj:
+                messagebox.showerror("Not Found", f"No employee found with ID: '{target_id}'", parent=self.edit_prompt_win)
+                return
+            
+            # Close prompt window and launch editing form window
+            self.edit_prompt_win.destroy()
+            self.launch_edit_form_window(employee_obj)
+
+        ctk.CTkButton(self.edit_prompt_win, text="Proceed to Edit", fg_color="#12E068", text_color="black", command=submit_lookup).pack(pady=15)
+
+    def launch_edit_form_window(self, emp_obj):
+        """Constructs an editing window looking EXACTLY like open_create_employee_win."""
+        self.edit_emp_win = ctk.CTkToplevel(self.winfo_toplevel())
+        self.edit_emp_win.title("Editing Employee Records")
+        self.edit_emp_win.geometry("500x700")
+        self.edit_emp_win.configure(fg_color="#e0e0e0")
+        self.edit_emp_win.deiconify()
+
+        # Shared static data mappings replicated from create step
+        self.dept_pos_map = {
+                "Human Resources": ["HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst"],
+                "Engineering & Development": ["Software Engineer", "Embedded Systems Developer", "Mobile App Developer", "DevOps Engineer", "QA Automation Engineer"],
+                "Data & Security": ["AI Engineer", "Data Scientist", "Cybersecurity Analyst", "Database Administrator"],
+                "Support & Operations": ["UI/UX Developer", "Technical Support Lead", "Operations Coordinator", "Project Manager"],
+                "IT Infrastructure & Cloud": ["Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk"]
+        }
+
+        self.salary_rates = {
+                "Software Engineer": {"Full": 60000, "Part": 600}, "Embedded Systems Developer": {"Full": 65000, "Part": 650},
+                "Mobile App Developer": {"Full": 55000, "Part": 550}, "DevOps Engineer": {"Full": 70000, "Part": 700},
+                "QA Automation Engineer": {"Full": 50000, "Part": 500}, "AI Engineer": {"Full": 85000, "Part": 850},
+                "Data Scientist": {"Full": 80000, "Part": 800}, "Cybersecurity Analyst": {"Full": 75000, "Part": 750},
+                "Database Administrator": {"Full": 65000, "Part": 650}, "HR Manager": {"Full": 45000, "Part": 450},
+                "Recruiter": {"Full": 35000, "Part": 350}, "Training Specialist": {"Full": 40000, "Part": 400},
+                "Compensation Analyst": {"Full": 42000, "Part": 420}, "UI/UX Developer": {"Full": 50000, "Part": 500},
+                "Technical Support Lead": {"Full": 35000, "Part": 350}, "Operations Coordinator": {"Full": 38000, "Part": 380},
+                "Project Manager": {"Full": 65000, "Part": 650}, "Cloud Architect": {"Full": 95000, "Part": 950},
+                "Network Engineer": {"Full": 55000, "Part": 550}, "Systems Administrator": {"Full": 50000, "Part": 500},
+                "IT Helpdesk": {"Full": 25000, "Part": 250}
+        }
+
+        ctk.CTkLabel(self.edit_emp_win, text="Modify Employee Info", text_color="black", font=("Helvetica", 40, "bold")).pack(padx=5, pady=15)
+        ctk.CTkLabel(self.edit_emp_win, text="Basic Information", text_color="black", font=self.primary_font).pack(padx=5, pady=5)
+
+        self.field_frame = ctk.CTkFrame(self.edit_emp_win, fg_color="#e0e0e0", width=450, height=600)
+        self.field_frame.pack(fill="x", padx=5, pady=5)
+
+        # ID Field (Immutable)
+        ctk.CTkLabel(self.field_frame, text="ID", text_color="black", font=self.primary_font).grid(row=0, column=0, sticky="w", padx=5, pady=10)
+        self.id_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
+        self.id_entry.grid(row=0, column=1)
+        self.id_entry.insert(0, str(emp_obj.id))
+        self.id_entry.configure(state="readonly")
+
+        # Type Dropdown
+        ctk.CTkLabel(self.field_frame, text="Type", text_color="black", font=self.primary_font).grid(row=0, column=2, sticky="e", padx=5, pady=10)
+        self.emp_dropdown = ctk.CTkComboBox(self.field_frame, values=["Part-Time", "Full-Time"], width=135, state="readonly", font=self.primary_font,
+            command=lambda status: [self.handle_emp_status(status), self.update_salary_display(self.position_dropdown.get())])
+        self.emp_dropdown.grid(row=0, column=3)
+        self.emp_dropdown.set(emp_obj.emp_type)
+
+        # Name Input
+        ctk.CTkLabel(self.field_frame, text="Name", text_color="black", font=self.primary_font).grid(row=1, column=0, sticky="w", padx=5, pady=10)
+        self.name_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
+        self.name_entry.grid(row=1, column=1)
+        self.name_entry.insert(0, emp_obj.name)
+
+        # Gender Dropdown
+        ctk.CTkLabel(self.field_frame, text="Gender", text_color="black", font=self.primary_font).grid(row=1, column=2, sticky="e", padx=5, pady=10)
+        self.gender_dropdown = ctk.CTkComboBox(self.field_frame, values=["Male", "Female"], width=135, state="readonly", font=self.primary_font)
+        self.gender_dropdown.grid(row=1, column=3)
+        self.gender_dropdown.set(emp_obj.gender)
+
+        # Department Dropdown
+        ctk.CTkLabel(self.field_frame, text="Department", text_color="black", font=self.primary_font).grid(row=2, column=0, sticky="w", padx=5, pady=10)
+        self.department_dropdown = ctk.CTkComboBox(self.field_frame, values=list(self.dept_pos_map.keys()), width=250, state="readonly", font=self.primary_font, command=self.update_position_list)
+        self.department_dropdown.grid(row=2, column=1, columnspan=2)
+        self.department_dropdown.set(emp_obj.department)
+
+        # Position Dropdown
+        ctk.CTkLabel(self.field_frame, text="Position", text_color="black", font=self.primary_font).grid(row=3, column=0, sticky="w", padx=5, pady=10)
+        initial_positions = self.dept_pos_map.get(emp_obj.department, [])
+        self.position_dropdown = ctk.CTkComboBox(self.field_frame, values=initial_positions, width=250, state="readonly", font=self.primary_font, command=self.update_salary_display)
+        self.position_dropdown.grid(row=3, column=1, columnspan=2)
+        self.position_dropdown.set(emp_obj.position)
+
+        # Salary Information Segment
+        ctk.CTkLabel(self.edit_emp_win, text="Salary Information", text_color="black", font=self.primary_font).pack(padx=5, pady=5)
+        self.salary_frame = ctk.CTkFrame(self.edit_emp_win, fg_color="#e0e0e0", width=450, height=600)
+        self.salary_frame.pack(fill="x", padx=5, pady=5)
+
+        self.salary_label = ctk.CTkLabel(self.salary_frame, text="Base Salary", font=self.primary_font)
+        self.salary_label.grid(row=0, column=0)
+        
+        self.salary_entry = ctk.CTkEntry(self.salary_frame, width=100, height=30, font=self.primary_font)
+        self.salary_entry.grid(row=0, column=1)
+        
+        self.hours_worked_label = ctk.CTkLabel(self.salary_frame, text="Hours Worked", font=self.primary_font)
+        self.hours_worked = ctk.CTkEntry(self.salary_frame, width=100, height=30, font=self.primary_font)
+
+        # Populate layout structure state based on standard employment type rules
+        if emp_obj.emp_type == "Part-Time":
+            self.salary_label.configure(text="Hourly Rate")
+            self.hours_worked_label.grid(row=0, column=2, sticky="e", padx=5, pady=10)
+            self.hours_worked.grid(row=0, column=3, sticky="e", padx=5, pady=10)
+            self.hours_worked.insert(0, str(emp_obj.hours_worked))
+            self.salary_entry.insert(0, f"₱{emp_obj.hourly_rate}")
+        else:
+            self.salary_label.configure(text="Monthly Salary")
+            self.salary_entry.insert(0, f"₱{emp_obj.get_salary()}")
+        self.salary_entry.configure(state="readonly")
+
+        # Contact and Payment details
+        ctk.CTkLabel(self.salary_frame, text="Email", text_color="black", font=self.primary_font).grid(row=1, column=0, sticky="w", padx=5, pady=10)
+        self.email_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
+        self.email_entry.grid(row=1, column=1, columnspan=2, sticky="w", padx=5, pady=10)
+        self.email_entry.insert(0, emp_obj.email)
+
+        ctk.CTkLabel(self.salary_frame, text="Bank Account", text_color="black", font=self.primary_font).grid(row=2, column=0, sticky="w", padx=5, pady=10)
+        self.bank_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
+        self.bank_entry.grid(row=2, column=1, columnspan=2, sticky="w", padx=5, pady=10)
+        self.bank_entry.insert(0, emp_obj.bank_account)
+
+        # Commit button mapping to local update processor
+        self.save_btn = ctk.CTkButton(self.edit_emp_win, text="Save Changes", font=self.primary_font, fg_color="#2196F3", text_color="white",
+                                    command=self.handle_edit_employee_data)
+        self.save_btn.pack(pady=20)
+        self.toplevelwindow = self.save_btn.winfo_toplevel()
+
+    def handle_edit_employee_data(self):
+        """Validates entry fields and mutates target record values inside files/lists."""
+        try:
+            manager = self.master.payroll_system
+            eid = self.id_entry.get()
+            name = self.name_entry.get().strip()
+            gender = self.gender_dropdown.get()
+            dep = self.department_dropdown.get()
+            pos = self.position_dropdown.get()
+            emp_type = self.emp_dropdown.get()
+            email = self.email_entry.get().strip()
+            bank_account = self.bank_entry.get().strip()
+            salary_val = float(self.salary_entry.get().replace("₱", ""))
+
+            original_emp = manager.search_employee_by_id(eid)
+            hire_date = original_emp.hire_date if original_emp else "2026-01-01"
+            
+            if not all([eid, name, gender, dep, pos, emp_type, email, bank_account]):
+                messagebox.showerror("Error", "Please fill in all empty fields.", parent=self.edit_emp_win)
+                return
+
+            if emp_type == "Part-Time":
+                hours = float(self.hours_worked.get())
+                manager.update_parttime_employee(eid, name, gender, dep, pos, hire_date, hours, salary_val, email, bank_account)
+            else:
+                manager.update_fulltime_employee(eid, name, gender, dep, pos, hire_date, salary_val, email, bank_account)
+
+            messagebox.showinfo("Success", f"Employee {name}'s changes have been synchronized!", parent=self.edit_emp_win)
+            self.edit_emp_win.destroy()
+            self.edit_emp_win = None
+
+        except ValueError:
+            messagebox.showerror("Input Error", "Please ensure numeric fields contain valid quantities.", parent=self.edit_emp_win)
         
 class ViewEmployeesFrame(ctk.CTkFrame):
     def __init__(self, master, on_back):

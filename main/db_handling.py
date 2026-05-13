@@ -28,19 +28,30 @@ class PayrollDataFileHandling:
         
     def save_employees(self, employee_list):
         """Saves the list of employee objects to a text file."""
-        with open(self.emp_filename, "w") as f:
-            for emp in employee_list:
-                line = (f"{emp.id}|{emp.name}|{emp.gender}|{emp.department}|"
-                        f"{emp.position}|{emp.hire_date}|{emp.email}|"
-                        f"{emp.bank_account}|{emp.emp_type}|{emp.get_salary()}")
+        if os.path.exists(self.emp_filename) and os.path.getsize(self.emp_filename) > 0:
+            try:
+                backup_path = self.emp_filename + ".bak"
+                with open(self.emp_filename, "r") as src, open(backup_path, "w") as dest:
+                    dest.write(src.read())
+            except Exception as backup_error:
+                print(f"[Database Warning] Error creating file checkpoint state: {backup_error}")
                 
-                if emp.emp_type == "Part-Time":
-                    line += f"|{emp.hours_worked}|{emp.hourly_rate}"
-                else:
-                    line += "|0|0"
-                
-                f.write(line + "\n")
-                
+        try:
+            with open(self.emp_filename, "w") as f:
+                for emp in employee_list:
+                    line = (f"{emp.id}|{emp.name}|{emp.gender}|{emp.department}|\"\
+                            f\"{emp.position}|{emp.hire_date}|{emp.email}|\"\
+                            f\"{emp.bank_account}|{emp.emp_type}|{emp.get_salary()}")
+                    
+                    if emp.emp_type == "Part-Time":
+                        line += f"|{emp.hours_worked}|{emp.hourly_rate}"
+                    else:
+                        line += "|0|0"
+                    
+                    f.write(line + "\n")
+        except Exception as write_error:
+            print(f"[Database Error] Fatal disruption while flashing memory matrices to disk: {write_error}")
+
     def load_employees_from_file(self):
         """Returns a list of raw data lines from the file."""
         if not os.path.exists(self.emp_filename):

@@ -47,21 +47,28 @@ class PayrollSystemManager:
     def __init__(self):
         self.db = PayrollDataFileHandling()
         self.employees = []
-        self.load_system_data()
 
-    def load_system_data(self):
-        """Load The Employees"""
         raw_data = self.db.load_employees_from_file()
-        for data in raw_data:
-            if data[8] == "Full-Time":
-                emp = FullTimeEmployee(data[0], data[1], data[2], data[3], data[4], data[5], float(data[9]), data[6], data[7])
-            else:
-                hours = float(data[10]) if len(data) > 10 else 0
-                rate = float(data[11]) if len(data) > 11 else 0
-                
-                emp = PartTimeEmployee(data[0], data[1], data[2], data[3], data[4], data[5], hours, rate, data[6], data[7])
+        self.load_system_data(raw_data)
+
+    def load_system_data(self, raw_data_list):
+        """Load The Employees"""
+        for data in raw_data_list:
+            if not data or len(data) < 9:
+                continue
+            try:
+                eid, name, gender, dept, pos, h_date, email, bank, e_type = data[:9]
+                if e_type == "Part-Time":
+                    hours = float(data[10]) if len(data) > 10 else 0.0
+                    rate = float(data[11]) if len(data) > 11 else 0.0
+                    emp = PartTimeEmployee(eid, name, gender, dept, pos, h_date, hours, rate, email, bank)
+                else:
+                    salary = float(data[9]) if len(data) > 9 else 0.0
+                    emp = FullTimeEmployee(eid, name, gender, dept, pos, h_date, salary, email, bank)
             
-            self.employees.append(emp)
+                self.employees.append(emp)
+            except (ValueError, IndexError) as e:
+                print(f"[Warning] Skipping corrupted line entries in data ledger: {data}. Error: {e}")
 
     def _sync(self):
         """Internal helper to save data to disk."""
@@ -110,3 +117,35 @@ class PayrollSystemManager:
         """Returns a list of employee objects that match the name (case-insensitive)."""
         matches = [emp for emp in self.employees if name.lower() in emp.name.lower()]
         return matches
+    
+    def update_fulltime_employee(self, id, name, gender, department, position, hire_date, salary, email, bank_account):
+        """Updates an existing Full-Time Employee's records."""
+        emp = self.search_employee_by_id(id)
+        if emp and emp.emp_type == "Full-Time":
+            emp.name = name
+            emp.gender = gender
+            emp.department = department
+            emp.position = position
+            emp.hire_date = hire_date
+            emp.set_salary(float(salary))
+            emp.email = email
+            emp.bank_account = bank_account
+            self._sync()
+            return True
+        return False
+    
+    def update_parttime_employee(self, id, name, gender, department, position, hire_date, hours_worked, hourly_rate, email, bank_account):
+        """Updates an existing Part-Time Employee's records."""
+        emp = self.search_employee_by_id(id)
+        if emp and emp.emp_type == "Part-Time":
+            emp.name = name
+            emp.gender = gender
+            emp.department = department
+            emp.position = position
+            emp.hire_date = hire_date
+            emp.hours_worked = float(hours_worked)
+            emp.hourly_rate = float(hourly_rate)
+            emp.calculate_salary()  # Recalculate salary based on new rates
+            self._sync()
+            return True
+        return False
