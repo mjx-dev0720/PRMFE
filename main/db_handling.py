@@ -1,5 +1,5 @@
 import os
-
+import datetime
 
 
 class PayrollDataFileHandling:
@@ -7,6 +7,7 @@ class PayrollDataFileHandling:
     def __init__(self):
         self.admin_filename = "db/admin_db.txt"
         self.emp_filename = "db/employees.txt"
+        self.history_filename = "db/history.txt"
         self.config_filename = "db/config.txt"
 
         if not os.path.exists("db"):
@@ -81,3 +82,63 @@ class PayrollDataFileHandling:
         self.next_id_counter += 1
         self.save_config()
         return new_id
+        
+    def save_salary_slip_record(self, emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, vat, ph, sss, pag, absent, net, date):
+        """
+        Saves a highly explicit, breakdown itemized payroll slip snapshot into the ledger file.
+        This guarantees data consistency even if rates change in the future.
+        """
+        try:
+            # Format numbers to 2 decimal places cleanly
+            line = (
+                f"{date}|{emp_id}|{name}|{dept}|{pos}|{emp_type}|"
+                f"{reg_pay:.2f}|{ot_pay:.2f}|{gross:.2f}|"
+                f"{vat:.2f}|{ph:.2f}|{sss:.2f}|{pag:.2f}|{absent:.2f}|{net:.2f}\n"
+            )
+            with open(self.history_filename, "a", encoding="utf-8") as f:
+                f.write(line)
+            return True
+        except Exception as e:
+            print(f"[Database Error] Failed to persist salary slip transaction record: {e}")
+            return False
+
+    def get_all_salary_slips(self):
+        """
+        Reads and parses every generated itemized payslip from the text storage layer.
+        Returns a structured dictionary matrix keyed by Employee ID for fast O(1) lookups.
+        """
+        slips_collection = {}
+        if not os.path.exists(self.history_filename):
+            return slips_collection
+        try:
+            with open(self.history_filename, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    tokens = line.strip().split("|")
+                    if len(tokens) >= 15:
+                        emp_id = tokens[1]
+                        # Group slips under each employee ID if they have multiple pay periods
+                        if emp_id not in slips_collection:
+                            slips_collection[emp_id] = []
+                        
+                        slips_collection[emp_id].append({
+                            "date": tokens[0],
+                            "name": tokens[2],
+                            "dept": tokens[3],
+                            "pos": tokens[4],
+                            "emp_type": tokens[5],
+                            "reg_pay": float(tokens[6]),
+                            "ot_pay": float(tokens[7]),
+                            "gross": float(tokens[8]),
+                            "vat": float(tokens[9]),
+                            "ph": float(tokens[10]),
+                            "sss": float(tokens[11]),
+                            "pag": float(tokens[12]),
+                            "absent": float(tokens[13]),
+                            "net": float(tokens[14])
+                        })
+            return slips_collection
+        except Exception as e:
+            print(f"[Database Error] Failed to compile historical salary slips tracking array: {e}")
+            return slips_collection

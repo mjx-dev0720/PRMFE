@@ -672,7 +672,6 @@ class HomePageFrame(ctk.CTkFrame):
                 messagebox.showerror("Not Found", f"No employee found with ID: '{target_id}'", parent=self.edit_prompt_win)
                 return
             
-            # Close prompt window and launch editing form window
             self.edit_prompt_win.destroy()
             self.launch_edit_form_window(employee_obj)
 
@@ -686,7 +685,6 @@ class HomePageFrame(ctk.CTkFrame):
         self.edit_emp_win.configure(fg_color="#e0e0e0")
         self.edit_emp_win.deiconify()
 
-        # Shared static data mappings replicated from create step
         self.dept_pos_map = {
                 "Human Resources": ["HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst"],
                 "Engineering & Development": ["Software Engineer", "Embedded Systems Developer", "Mobile App Developer", "DevOps Engineer", "QA Automation Engineer"],
@@ -780,7 +778,6 @@ class HomePageFrame(ctk.CTkFrame):
             self.salary_entry.insert(0, f"₱{emp_obj.get_salary()}")
         self.salary_entry.configure(state="readonly")
 
-        # Contact and Payment details
         ctk.CTkLabel(self.salary_frame, text="Email", text_color="black", font=self.primary_font).grid(row=1, column=0, sticky="w", padx=5, pady=10)
         self.email_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
         self.email_entry.grid(row=1, column=1, columnspan=2, sticky="w", padx=5, pady=10)
@@ -792,7 +789,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.bank_entry.insert(0, emp_obj.bank_account)
 
         # Commit button mapping to local update processor
-        self.save_btn = ctk.CTkButton(self.edit_emp_win, text="Save Changes", font=self.primary_font, fg_color="#2196F3", text_color="white",
+        self.save_btn = ctk.CTkButton(self.edit_emp_win, text="Update", font=self.primary_font, fg_color="#2196F3", text_color="white",
                                     command=self.handle_edit_employee_data)
         self.save_btn.pack(pady=20)
         self.toplevelwindow = self.save_btn.winfo_toplevel()
@@ -825,7 +822,7 @@ class HomePageFrame(ctk.CTkFrame):
                 salary_val = float(self.salary_entry.get().replace("₱", "").replace(",", ""))
                 manager.update_fulltime_employee(eid, name, gender, dep, pos, hire_date, salary_val, email, bank_account)
 
-            messagebox.showinfo("Success", f"Employee {name}'s changes have been synchronized!", parent=self.edit_emp_win)
+            messagebox.showinfo("Success", f"Employee {name}'s changes have been updated!", parent=self.edit_emp_win)
             self.edit_emp_win.destroy()
             self.edit_emp_win = None
 
@@ -1025,24 +1022,21 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.days_present_entry = ctk.CTkEntry(self.right_panel, width=150)
         self.days_present_entry.grid(row=5, column=1, sticky="w")
 
-        self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, fg_color="#12E068", 
+        self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, width=120, fg_color="#12E068", 
                                         text_color="black", font=self.primary_font, command=self.compute_payroll)
         self.compute_btn.grid(row=6, column=0, columnspan=2, pady=30, padx=20, sticky="ew")
-
-        self.queue_btn = ctk.CTkButton(self.right_panel, text="ADD TO QUEUE", 
-                                        fg_color="orange", text_color="black", 
-                                        command=self.add_to_processing_queue)
-        self.queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
 
         self.queue_status_label = ctk.CTkLabel(self.right_panel, text="Queue: 0 Employees", text_color="blue")
         self.queue_status_label.grid(row=8, column=0, columnspan=2, pady=5)
 
-        self.process_all_btn = ctk.CTkButton(self.right_panel, text="PROCESS ENTIRE QUEUE", 
-                                            fg_color="#12E068", text_color="black",
-                                            command=self.process_entire_queue)
-        self.process_all_btn.grid(row=9, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
+        self.bulk_queue_btn = ctk.CTkButton(self.right_panel, text="ENQUEUE ALL EMPLOYEES", height=45, width=120,
+                                            fg_color="#3a7ebf", text_color="white", 
+                                            command=self.bulk_enqueue_all)
+        self.bulk_queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
-        ctk.CTkButton(self, text="BACK", fg_color="red", width=120, height=40, font=self.primary_font,
+        ctk.CTkButton(self.right_panel, text="Get All Slip", command=self.process_and_display_all_queued).grid(row=8, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
+
+        ctk.CTkButton(self, text="BACK", fg_color="red", width=100, height=40, font=self.primary_font,
                     command=lambda: self.master.show_home_page(self.master.auth_user)).pack(pady=10)
         
     def auto_compute_for_queue(self, emp):
@@ -1050,8 +1044,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         try:
             if emp.emp_type == "Full-Time":
                 gross = emp.get_salary()
-                reg_pay = gross
-                ot_pay = 0
             else:
                 rate = getattr(emp, 'hourly_rate', 0)
                 hours = getattr(emp, 'hours_worked', 0)
@@ -1067,49 +1059,66 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             attendance_deduct = 0 
             
             net = gross - (vat + ph + sss + pag + attendance_deduct)
-
-            self.master.salary_records.add_record(emp.id, emp.name, net)
             
             return net
 
         except Exception as e:
             print(f"Error processing {emp.name}: {e}")
             return 0
-
-
-    def add_to_processing_queue(self):
-        query = self.search_id_entry.get().strip()
-        emp = self.master.payroll_system.search_employee_by_id(query)
+        
+    def bulk_enqueue_all(self):
+        """Loads all active employees from the system manager directly into the FIFO pipeline."""
+        manager = self.master.payroll_system
         queue = self.master.payroll_queue
         
-        if emp:
-            queue.enqueue(emp)
+        if not manager.employees:
+            messagebox.showwarning("Warning", "No employee databases loaded to queue.")
+            return
             
-            count = queue.get_size()
-            self.queue_status_label.configure(text=f"Queue: {count} Employees")
-            
-            messagebox.showinfo("Queue", f"{emp.name} added to the line.")
-        else:
-            messagebox.showerror("Error", "Search for an employee first!")
+        counter = 0
+        for emp in manager.employees:
+            # Prevent double enqueuing if they are already in the line
+            if emp not in queue._queue:
+                queue.enqueue(emp)
+                counter += 1
+                
+        # Immediately refresh status labels
+        self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
+        messagebox.showinfo("Success", f"Successfully loaded {counter} employees into the Pay-Run sequence!")
 
     def process_entire_queue(self):
+        """Executes FIFO dequeue operations and channels transaction records through the file handling data layer."""
         queue = self.master.payroll_queue
         
         if queue.get_size() == 0:
-            messagebox.showwarning("Empty", "There is no one in the queue to process.")
+            messagebox.showwarning("Empty Queue", "There are no pending employee entries in the pay-run block.")
             return
 
-        summary = "Batch Processing Results:\n"
+        summary = f"=== BATCH PAY-RUN RECORD ({datetime.datetime.now().strftime('%M:%S')}) ===\n"
+        processed_count = 0
         
-        while not queue.get_size() == 0:
+        # Access the centralized file handler from the app framework layer
+        db_handler = self.master.file_handler  # explicitly calling PayrollDataFileHandling instance
+
+        while not queue.is_empty():
             emp = queue.dequeue()
             net_pay = self.auto_compute_for_queue(emp)
-            summary += f"- {emp.name}: Paid ₱{net_pay:,.2f}\n"
+            
+            # 1. Update the custom Linked List history structure in memory
+            self.master.salary_records.add_record(emp.id, emp.name, net_pay)
+            
+            # 2. delegate storage persistence entirely to db_handling.py
+            db_handler.log_pay_run_transaction(emp.id, emp.name, emp.emp_type, net_pay)
+            
+            summary += f"✔ ID {emp.id} - {emp.name}: Paid ₱{net_pay:,.2f}\n"
+            processed_count += 1
 
+        # Reset UI structural counters
         self.queue_status_label.configure(text="Queue: 0 Employees")
 
-        messagebox.showinfo("Queue Processed", summary)
-        self.master.salary_records.display_all() #
+        # Display transaction metrics window
+        messagebox.showinfo("Pay-Run Complete", f"Successfully processed {processed_count} disbursements!\n\n{summary}")
+        self.master.salary_records.display_all()
 
     def set_current_datetime(self):
         now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -1149,8 +1158,10 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 
                 self.monthly_salary_label.grid(row=2, column=0, padx=20, pady=10, sticky="w")
                 self.monthly_salary_entry.grid(row=2, column=1, sticky="w")
+                self.monthly_salary_entry.configure(state="normal") 
                 self.monthly_salary_entry.delete(0, "end")
-                self.monthly_salary_entry.insert(0, str(emp.get_salary())) #
+                self.monthly_salary_entry.insert(0, str(emp.get_salary()))
+                self.monthly_salary_entry.configure(state="readonly") 
                 
             else:
                 self.monthly_salary_label.grid_remove()
@@ -1204,6 +1215,18 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             total_statutory = vat_amount + philhealth_amount + sss_amount + pagibig_amount
             total_all_deductions = total_statutory + attendance_deduction
             net_salary = gross - total_all_deductions
+
+            emp_id = self.search_id_entry.get().strip()
+            name = self.name_entry.get()
+            dept = self.dept_entry.get()
+            pos = self.pos_entry.get()
+            current_date = self.date_entry.get()
+
+            self.master.file_handler.save_salary_slip_record(
+                emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, 
+                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
+                attendance_deduction, net_salary, current_date
+            )
 
             self.display_payslip(
                 reg_pay, ot_pay, gross, 
@@ -1318,6 +1341,160 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         
         ctk.CTkLabel(row, text=value_text, text_color="black", font=("Helvetica", 11, "bold"), 
                     anchor="e", padx=10).pack(side="right", fill="x", expand=True, pady=2)
+        
+    def process_and_display_all_queued(self):
+        """Dequeues every employee, computes salaries, saves to database, and shows an elegant batch summary window."""
+        import datetime
+        queue = self.master.payroll_queue
+
+        if queue.is_empty():
+            messagebox.showwarning("Empty Queue", "There are no pending employees in the pay-run queue.")
+            return
+
+        processed_slips = []  # Keeps track of slips generated in this specific batch run
+
+        while not queue.is_empty():
+            emp = queue.dequeue()
+
+            emp_id = str(emp.id)
+            name = emp.name
+            dept = emp.department
+            pos = emp.position
+            emp_type = emp.emp_type
+            current_date = datetime.datetime.now().strftime("%B %d, %Y")
+
+            # Calculations
+            if emp_type == "Full-Time":
+                gross_monthly = float(emp.get_salary()) if emp.get_salary() > 0 else 30000.0
+                reg_pay = gross_monthly
+                ot_pay = 0.0
+                gross = reg_pay + ot_pay
+            else:
+                rate = float(emp.hourly_rate) if hasattr(emp, 'hourly_rate') else 500.0
+                hours = float(emp.hours_worked) if hasattr(emp, 'hours_worked') else 40.0
+                reg_hours = min(hours, 40.0)
+                ot_hours = max(0.0, hours - 40.0)
+                reg_pay = reg_hours * rate
+                ot_pay = ot_hours * (rate * 1.5)
+                gross = reg_pay + ot_pay
+
+            vat_amount = gross * 0.12
+            philhealth_amount = gross * 0.05
+            sss_amount = gross * 0.04
+            pagibig_amount = gross * 0.02
+            attendance_deduction = 0.0
+
+            total_statutory = vat_amount + philhealth_amount + sss_amount + pagibig_amount
+            net_salary = gross - total_statutory
+
+            # 1. Save to historical text database ledger
+            self.master.file_handler.save_salary_slip_record(
+                emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, 
+                vat_amount, philhealth_amount, sss_amount, pagibig_amount, 
+                attendance_deduction, net_salary, current_date
+            )
+
+            # 2. Sync to local runtime Linked List reporting structure
+            self.master.salary_records.add_record(emp_id, name, net_salary)
+
+            # 3. Cache the exact snapshot values into our local array for display
+            slip_snapshot = {
+                "date": current_date, "id": emp_id, "name": name, "dept": dept, "pos": pos,
+                "emp_type": emp_type, "reg_pay": reg_pay, "ot_pay": ot_pay, "gross": gross,
+                "vat": vat_amount, "ph": philhealth_amount, "sss": sss_amount, "pag": pagibig_amount,
+                "absent": attendance_deduction, "net": net_salary
+            }
+            processed_slips.append(slip_snapshot)
+
+        if hasattr(self, 'queue_status_label'):
+            self.queue_status_label.configure(text="Queue: 0 Employees")
+
+        # Open the single dashboard window showing the batch items cleanly
+        self.open_batch_summary_window(processed_slips)
+
+    def open_batch_summary_window(self, slips_list):
+        """Displays a clean window allowing users to select and inspect slips from the batch run."""
+        summary_win = ctk.CTkToplevel(self.master)
+        summary_win.title("Batch Payroll Execution Summary")
+        summary_win.geometry("950x650")
+        summary_win.resizable(False, False)
+        summary_win.configure(fg_color="#f5f5f5")
+        summary_win.attributes("-topmost", True)
+
+        # Banner Header
+        banner = ctk.CTkFrame(summary_win, fg_color="#c2f0d1", corner_radius=0, height=50)
+        banner.pack(fill="x", side="top")
+        ctk.CTkLabel(banner, text=f"Batch Run Complete: Processed {len(slips_list)} Slips Successfully", 
+                    text_color="black", font=("Helvetica", 16, "bold")).pack(pady=10)
+
+        # Main Split Body Layout Frame
+        main_body = ctk.CTkFrame(summary_win, fg_color="transparent")
+        main_body.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Left Column Frame: The List Selection Pane
+        left_pane = ctk.CTkFrame(main_body, width=300, fg_color="white", border_color="#d3d3d3", border_width=1)
+        left_pane.pack(side="left", fill="both", padx=(0, 10))
+        left_pane.pack_propagate(False)
+        
+        ctk.CTkLabel(left_pane, text="Select Employee to View Slip", font=("Helvetica", 13, "bold"), text_color="black").pack(pady=10)
+
+        # Right Column Frame: The Live View Details Card
+        right_pane = ctk.CTkFrame(main_body, fg_color="white", border_color="#d3d3d3", border_width=1)
+        right_pane.pack(side="right", fill="both", expand=True)
+
+        def populate_slip_details(slip):
+            """Clears old content from the right pane and populates the selected employee's itemized card."""
+            for widget in right_pane.winfo_children():
+                widget.destroy()
+
+            # Slip Header View Area
+            ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {slip['date']}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
+            
+            info_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
+            info_frame.pack(fill="x", padx=30, pady=5)
+            
+            # Use data straight out of the snapshot block token dictionary, bypassing active entry fields!
+            self._create_slip_row(info_frame, "EMPLOYEE NAME:", slip['name'])
+            self._create_slip_row(info_frame, "EMPLOYEE ID:", slip['id'])
+            self._create_slip_row(info_frame, "DEPARTMENT:", slip['dept'])
+            self._create_slip_row(info_frame, "POSITION:", slip['pos'])
+            self._create_slip_row(info_frame, "EMPLOYEE TYPE:", slip['emp_type'])
+
+            ctk.CTkFrame(right_pane, height=2, fg_color="#e0e0e0").pack(fill="x", padx=30, pady=10)
+
+            money_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
+            money_frame.pack(fill="x", padx=30, pady=5)
+            self._create_slip_row(money_frame, "REGULAR EARNINGS:", f"Php {slip['reg_pay']:,.2f}")
+            self._create_slip_row(money_frame, "OVERTIME PAYMENTS:", f"Php {slip['ot_pay']:,.2f}")
+            self._create_slip_row(money_frame, "GROSS BASE PAY:", f"Php {slip['gross']:,.2f}")
+            self._create_slip_row(money_frame, "STATUTORY DEDUCTIONS:", f"Php {(slip['vat'] + slip['ph'] + slip['sss'] + slip['pag']):,.2f}")
+            
+            # Net Cash Takehome Footer Panel
+            net_box = ctk.CTkFrame(right_pane, fg_color="#90ee90", corner_radius=4)
+            net_box.pack(fill="x", padx=30, pady=20, side="bottom")
+            ctk.CTkLabel(net_box, text=f"NET SALARY RECEIVED: Php {slip['net']:,.2f}", 
+                        text_color="black", font=("Helvetica", 16, "bold")).pack(pady=12)
+
+        # Populate Left List Panel with interactive clickable target buttons
+        scroll_container = ctk.CTkScrollableFrame(left_pane, fg_color="transparent")
+        scroll_container.pack(fill="both", expand=True, padx=5, pady=5)
+
+        for slip in slips_list:
+            btn_text = f"{slip['id']} - {slip['name']}"
+            btn = ctk.CTkButton(
+                scroll_container, 
+                text=btn_text, 
+                anchor="w", 
+                fg_color="#f8f9fa", 
+                text_color="black",
+                hover_color="#e2e6ea",
+                command=lambda s=slip: populate_slip_details(s)
+            )
+            btn.pack(fill="x", pady=4, padx=5)
+
+        # Automatically open the details page for the very first employee in the list initially
+        if slips_list:
+            populate_slip_details(slips_list[0])
         
 class PayrollSystemApp(ctk.CTk):
     def __init__(self, screenWidth=1280, screenHeight=720):
