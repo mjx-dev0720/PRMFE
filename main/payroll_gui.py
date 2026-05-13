@@ -1208,7 +1208,17 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
             current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
-            hours_val = getattr(emp, 'hours_worked', None) if emp.emp_type == "Part-Time" else None
+            hours_val = None
+            if emp.emp_type == "Part-Time":
+                if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
+                    try:
+                        hours_val = float(self.hours_entry.get().strip())
+                    except ValueError:
+                        messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
+                        return
+                else:
+                    hours_val = getattr(emp, 'hours_worked', 40.0)
+
             pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_input)
 
 
@@ -1349,8 +1359,17 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             emp = queue.dequeue()
 
             absences_to_charge = getattr(emp, 'staged_absences', 0.0)
-            # If the employee is Part-Time, we fetch their hours dynamically
-            hours_val = getattr(emp, 'hours_worked', None) if emp.emp_type == "Part-Time" else None
+            
+            hours_val = None
+            if emp.emp_type == "Part-Time":
+                if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
+                    try:
+                        hours_val = float(self.hours_entry.get().strip())
+                    except ValueError:
+                        messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
+                        return
+                else:
+                    hours_val = getattr(emp, 'hours_worked', 40.0)
             pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_to_charge)
             
             final_gross = pay_data["gross"]
