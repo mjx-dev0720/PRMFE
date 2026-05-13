@@ -15,7 +15,7 @@ class Employee:
 
 
     def __repr__(self):
-        return f"ID:{self.id} NAME:{self.name}"
+        return f"{self.id} : {self.name}"
 
     def set_salary(self, amount):
         if amount > 0:
@@ -149,11 +149,14 @@ class PayrollSystemManager:
     
     def delete_employee_by_name(self, employee_name):
         """Removes a specific employee object by Name."""
-        if employee_name in self.employees:
-            self.employees.remove(employee_name)
-            self._sync()
-            return True
-        return False
+        target_name = str(employee_name).strip()
+        for emp in self.employees:
+            cur_emp = str(emp.name).strip()
+            if cur_emp in target_name:
+                self.employees.remove(employee_name)
+                self._sync()
+                return True, emp.name
+        return False, None
     
     def search_employee_by_id(self, eid):
         """Returns the employee object if found, otherwise None."""

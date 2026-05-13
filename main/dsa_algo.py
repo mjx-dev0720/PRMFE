@@ -29,7 +29,7 @@ class SalaryRecord():
         current = self.head
         records = []
         while current:
-            records.append(f"ID: {current.employee_id} | Name: {current.name} | Paid: ₱{current.salary:,.2f}")
+            records.append(f"{current.employee_id:<8} {current.name:<30} ₱{current.salary:<12,.2f}")
             current = current.next
         return records
     
