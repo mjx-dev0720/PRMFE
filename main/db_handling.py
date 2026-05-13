@@ -35,13 +35,11 @@ class PayrollDataFileHandling:
                     dest.write(src.read())
             except Exception as backup_error:
                 print(f"[Database Warning] Error creating file checkpoint state: {backup_error}")
-                
+
         try:
             with open(self.emp_filename, "w") as f:
                 for emp in employee_list:
-                    line = (f"{emp.id}|{emp.name}|{emp.gender}|{emp.department}|\"\
-                            f\"{emp.position}|{emp.hire_date}|{emp.email}|\"\
-                            f\"{emp.bank_account}|{emp.emp_type}|{emp.get_salary()}")
+                    line = f"{emp.id}|{emp.name}|{emp.gender}|{emp.department}|{emp.position}|{emp.hire_date}|{emp.email}|{emp.bank_account}|{emp.emp_type}|{emp.get_salary()}"
                     
                     if emp.emp_type == "Part-Time":
                         line += f"|{emp.hours_worked}|{emp.hourly_rate}"

@@ -121,15 +121,25 @@ class PayrollSystemManager:
     def update_fulltime_employee(self, id, name, gender, department, position, hire_date, salary, email, bank_account):
         """Updates an existing Full-Time Employee's records."""
         emp = self.search_employee_by_id(id)
-        if emp and emp.emp_type == "Full-Time":
-            emp.name = name
-            emp.gender = gender
-            emp.department = department
-            emp.position = position
-            emp.hire_date = hire_date
-            emp.set_salary(float(salary))
-            emp.email = email
-            emp.bank_account = bank_account
+        if emp:
+            if emp.emp_type != "Full-Time":
+                # Create a fresh FullTimeEmployee replacement object instance
+                new_emp = FullTimeEmployee(id, name, gender, department, position, hire_date, float(salary), email, bank_account)
+                
+                # Find the index position of the old object and swap it in memory
+                idx = self.employees.index(emp)
+                self.employees[idx] = new_emp
+            else:
+                # Standard property updating if type remains the same
+                emp.name = name
+                emp.gender = gender
+                emp.department = department
+                emp.position = position
+                emp.hire_date = hire_date
+                emp.set_salary(float(salary))
+                emp.email = email
+                emp.bank_account = bank_account
+                
             self._sync()
             return True
         return False
@@ -137,15 +147,26 @@ class PayrollSystemManager:
     def update_parttime_employee(self, id, name, gender, department, position, hire_date, hours_worked, hourly_rate, email, bank_account):
         """Updates an existing Part-Time Employee's records."""
         emp = self.search_employee_by_id(id)
-        if emp and emp.emp_type == "Part-Time":
-            emp.name = name
-            emp.gender = gender
-            emp.department = department
-            emp.position = position
-            emp.hire_date = hire_date
-            emp.hours_worked = float(hours_worked)
-            emp.hourly_rate = float(hourly_rate)
-            emp.calculate_salary()  # Recalculate salary based on new rates
+        if emp:
+            # Check if we are changing types from Full-Time to Part-Time
+            if emp.emp_type != "Part-Time":
+                # Create a fresh PartTimeEmployee replacement object instance
+                new_emp = PartTimeEmployee(id, name, gender, department, position, hire_date, float(hours_worked), float(hourly_rate), email, bank_account)
+                
+                # Find the index position of the old object and swap it in memory
+                idx = self.employees.index(emp)
+                self.employees[idx] = new_emp
+            else:
+                # Standard property updating if type remains the same
+                emp.name = name
+                emp.gender = gender
+                emp.department = department
+                emp.position = position
+                emp.hire_date = hire_date
+                emp.hours_worked = float(hours_worked)
+                emp.hourly_rate = float(hourly_rate)
+                emp.calculate_salary()
+                
             self._sync()
             return True
         return False

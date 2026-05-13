@@ -809,7 +809,6 @@ class HomePageFrame(ctk.CTkFrame):
             emp_type = self.emp_dropdown.get()
             email = self.email_entry.get().strip()
             bank_account = self.bank_entry.get().strip()
-            salary_val = float(self.salary_entry.get().replace("₱", ""))
 
             original_emp = manager.search_employee_by_id(eid)
             hire_date = original_emp.hire_date if original_emp else "2026-01-01"
@@ -820,8 +819,10 @@ class HomePageFrame(ctk.CTkFrame):
 
             if emp_type == "Part-Time":
                 hours = float(self.hours_worked.get())
-                manager.update_parttime_employee(eid, name, gender, dep, pos, hire_date, hours, salary_val, email, bank_account)
+                rate = float(self.salary_entry.get().replace("₱", "").replace(",", ""))
+                manager.update_parttime_employee(eid, name, gender, dep, pos, hire_date, hours, rate, email, bank_account)
             else:
+                salary_val = float(self.salary_entry.get().replace("₱", "").replace(",", ""))
                 manager.update_fulltime_employee(eid, name, gender, dep, pos, hire_date, salary_val, email, bank_account)
 
             messagebox.showinfo("Success", f"Employee {name}'s changes have been synchronized!", parent=self.edit_emp_win)
