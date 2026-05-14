@@ -2,31 +2,25 @@ from db_handling import *
 from dsa_algo import *
 from payroll_sys import *
 import datetime
-import os
 
 #Console Based System
 
-# --- INITIALIZE REAL DATA STRUCTURES FROM dsa_algo.py ---
-# Instead of basic arrays, we instantiate your required tracking classes
-PAYROLL_QUEUE = PayrollQueue() # True FIFO Queue from dsa_algo.py for Option [7]
+PAYROLL_QUEUE = PayrollQueue()
 PAYROLL_SYS = PayrollSystemManager()
-SALARY_HISTORY = SalaryRecord() # Custom Linked List from dsa_algo.py for Option [8]
-SORTER = PayrollAlgo()   # Custom Merge Sort Algorithm class from dsa_algo.py
+SALARY_HISTORY = SalaryRecord() 
+SORTER = PayrollAlgo()   
 FILE_HANDLER = PayrollDataFileHandling()
-EMPLOYEES_LIST = PAYROLL_SYS.employees          # Native list holding live active Employee instances
+EMPLOYEES_LIST = PAYROLL_SYS.employees    
 
 def initialize_system_data():
     """Loads active employees and populates the historical salary linked list from the file storage layer."""
     try:
         PAYROLL_SYS.employees.clear()
-        # 1. Load active employees into the manager
         raw_data = FILE_HANDLER.load_employees_from_file()
         PAYROLL_SYS.load_system_data(raw_data)
         
-        # 2. Sync the file history ledger back into our SalaryRecord Linked List
-        historical_slips = FILE_HANDLER.get_all_salary_slips() # Returns the dict matrix
+        historical_slips = FILE_HANDLER.get_all_salary_slips()
         
-        # Loop through the dictionary and insert them into the linked list
         for emp_id, slips in historical_slips.items():
             for slip in slips:
                 SALARY_HISTORY.add_record(
@@ -40,7 +34,6 @@ def initialize_system_data():
 
 def print_row(emp, count=None):
     """Utility format print layout extracting attributes from an object instance with perfect tab column gaps."""
-    # Using dynamic checks to safely handle any formatting if an attribute is an integer or string
     emp_id = str(emp.id)
     emp_name = str(emp.name)
     emp_dept = str(emp.department)
@@ -335,9 +328,8 @@ def main():
                     emp = PAYROLL_QUEUE.pop()
                         
                 if emp is None:
-                    break  # Guard rail for queue structures returning None when exhausted
+                    break 
                     
-                    # 3. Calculate payroll automatically (Assuming 0 absences for batch runs)
                 hours_val = getattr(emp, 'hours_worked', None) if emp.emp_type == "Part-Time" else None
                 pay = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=0.0)
 
@@ -351,20 +343,18 @@ def main():
                 reg_pay = float(pay.get('reg_pay', gross))
                 ot_pay = float(pay.get('ot_pay', 0.0))
 
-                    # 4. Commit to Custom Linked List History (matching Option 6 methods)
                 if hasattr(SALARY_HISTORY, 'add_record'):
                     SALARY_HISTORY.add_record(str(emp.id), emp.name, net)
                 elif hasattr(SALARY_HISTORY, 'insert'):
                     SALARY_HISTORY.insert(str(emp.id), emp.name, net)
 
-                    # 5. Backup slip records to file engine logs
                 try:
                     FILE_HANDLER.save_salary_slip_record(
                         str(emp.id), emp.name, emp.department, emp.position, 
                         emp.emp_type, reg_pay, ot_pay, gross, vat, ph, sss, pag, absent_deduction, net, current_date
                     )
                 except Exception as db_err:
-                    pass # Kept silent during massive batch processing loops to prevent logs spamming
+                    pass
                     
                 print(f" -> Processed: ID {emp.id:<5} | {emp.name:<25} |Sending to Bank Account: {emp.bank_account} -> PAID: ₱{net:>10,.2f}")
                 processed_count += 1
@@ -417,11 +407,9 @@ def main():
 
             if subchoice == 1:
                 print("\nSorting employees alphabetically (A-Z)...")
-                # reverse=False forces ascending (A-Z) order
                 sorted_list = SORTER.merge_sort(sandbox_list, criteria="alphabetical", reverse=False)
             elif subchoice == 2:
                 print("\nSorting employees by department (A-Z)...")
-                # reverse=False forces alphabetical order for the department names
                 sorted_list = SORTER.merge_sort(sandbox_list, criteria="department", reverse=False)
             elif subchoice == 3:
                 try:

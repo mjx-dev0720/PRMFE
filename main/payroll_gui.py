@@ -5,6 +5,7 @@ from db_handling import PayrollDataFileHandling
 import datetime
 from dsa_algo import *
 
+#Admin Login Frame
 class AdminLoginFrame(ctk.CTkFrame):
     def __init__(self, master, on_login_success,  width=800, height=500, fg_color="#e0e0e0", border_color="black", border_width=1, corner_radius=0):
         super().__init__(master, width=width, height=height, fg_color=fg_color, 
@@ -100,6 +101,7 @@ class AdminLoginFrame(ctk.CTkFrame):
         else:
             messagebox.showerror("Error", "Invalid Credentials")
 
+#Home Page Frame
 class HomePageFrame(ctk.CTkFrame):
     def __init__(self, master, username="admin"):
         super().__init__(master, fg_color="white")
@@ -249,14 +251,14 @@ class HomePageFrame(ctk.CTkFrame):
             )
         view_records_lbl.pack(side="right", padx=20)
         view_records_lbl.bind("<Button-1>", lambda e: self.master.show_salary_records_page())
-        
+    
+    #Open Create Employee Window
     def open_create_employee_win(self):
         self.create_emp = ctk.CTkToplevel(self.winfo_toplevel())
         self.create_emp.title("Creating Employee")
         self.create_emp.geometry("500x700")
         self.create_emp.configure(fg_color="#e0e0e0")
         self.create_emp.deiconify()
-        print("Opened", self.create_emp)
 
         self.create_emp.protocol("WM_DELETE_WINDOW", self.event_exit_create_win)
 
@@ -450,6 +452,7 @@ class HomePageFrame(ctk.CTkFrame):
 
         self.toplevelwindow = self.save_btn.winfo_toplevel()
     
+    #Logic to automaticallly insert the position
     def update_position_list(self, selected_dept):
         positions = self.dept_pos_map.get(selected_dept, [])
         self.position_dropdown.configure(values=positions)
@@ -460,6 +463,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.salary_entry.insert(0, "₱0")
         self.salary_entry.configure(state="readonly")
 
+    #Logic to automatically insert the salary
     def update_salary_display(self, pos):
         is_part_time = self.emp_dropdown.get() == "Part-Time"
         rates = self.salary_rates.get(pos, {"Full": 0, "Part": 0})
@@ -470,7 +474,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.salary_entry.insert(0, f"₱{amount}")
         self.salary_entry.configure(state="readonly")
 
-        
+    #Logic For Employee Type Entries Showing
     def handle_emp_status(self, status):
         if status == "Part-Time":
             self.salary_label.configure(text="Hourly Rate")
@@ -482,6 +486,7 @@ class HomePageFrame(ctk.CTkFrame):
             self.hours_worked_label.grid_forget()
             self.hours_worked.grid_forget()
 
+    #Safety Net if someone accidently close the window while creating
     def event_exit_create_win(self):
         if self.name_entry.get() != "":
             if messagebox.askyesno("Exit", "You have unsaved data. Are you sure you want to close this window?"):
@@ -493,10 +498,12 @@ class HomePageFrame(ctk.CTkFrame):
             self.create_emp.destroy()
             
 
+    #This Function Handle The Creation Of An Employee Object
     def handle_employee_data(self):
         try:
             manager = self.master.payroll_system
             
+            #Get All Entries And Dropdown data
             eid = self.id_entry.get()
             name = self.name_entry.get()
             gender = self.gender_dropdown.get()
@@ -508,12 +515,14 @@ class HomePageFrame(ctk.CTkFrame):
             bank_account = self.bank_entry.get()
             salary_val = float(self.salary_entry.get().replace("₱", ""))
 
+            #Validation
             if eid == "" or name == "" or gender == "" or dep == "" or pos == "" or emp_type == "" or email == "" or bank_account == "":
                 messagebox.showerror("Error", "Please Input All Fields.")
                 self.toplevelwindow.lift()
                 self.toplevelwindow.focus_force()
                 return
-                
+            
+            #auto incrementing id system
             emp_id = self.master.file_handler.commit_next_id()
 
             if emp_type == "Part-Time":
@@ -522,14 +531,12 @@ class HomePageFrame(ctk.CTkFrame):
             else:
                 manager.add_fulltime_employee(emp_id, name, gender, dep, pos, hire_date, salary_val, email, bank_account)
             
-
-            print(manager.employees)
             messagebox.showinfo("Success", f"Employee {name} ({pos}) saved!")
 
-        
             self.toplevelwindow.lift()
             self.toplevelwindow.focus_force()
 
+            #after creation logic
             self.salary_entry.configure(state="normal")
             self.salary_entry.delete(0, "end")
             self.salary_entry.insert(0, "₱0")
@@ -557,6 +564,7 @@ class HomePageFrame(ctk.CTkFrame):
             self.toplevelwindow.lift()
             self.toplevelwindow.focus_force()
 
+    #Open Delete Employee Window
     def open_delete_employee_win(self):
         self.del_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.del_win.title("Delete Employee")
@@ -578,6 +586,7 @@ class HomePageFrame(ctk.CTkFrame):
                                         command=self.handle_delete_action)
         delete_confirm_btn.pack(pady=20)
 
+    #This Function Handle The Deletion of Employee
     def handle_delete_action(self):
         query = self.del_id_entry.get().strip()
         manager = self.master.payroll_system
@@ -605,6 +614,7 @@ class HomePageFrame(ctk.CTkFrame):
             messagebox.showerror("Not Found", f"No record found for '{query}'.")
             self.del_win.lift()
 
+    #Open Search Employee Window
     def open_search_employee_win(self):
         self.search_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.search_win.title("Search Employee")
@@ -627,6 +637,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.search_result = ctk.CTkLabel(result_frame, text="")
         self.search_result.grid(row=1, column=0, columnspan=1, pady=10)
 
+    #This Function Handles The Searching Mechanism/Logic 
     def handle_search_action(self):
         query = self.search_id_entry.get().strip()
         manager = self.master.payroll_system
@@ -657,9 +668,8 @@ class HomePageFrame(ctk.CTkFrame):
             messagebox.showerror("Not Found", f"No employee found matching '{query}'.")
             self.search_win.lift()
 
+    #Open Edit Employee Window
     def open_edit_employee_win(self):
-        """Prompts for an Employee ID, searches for it, and opens an identical window to edit records."""
-        # 1. Ask for Employee ID
         self.edit_prompt_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.edit_prompt_win.title("Edit Employee Lookup")
         self.edit_prompt_win.geometry("380x180")
@@ -685,6 +695,7 @@ class HomePageFrame(ctk.CTkFrame):
 
         ctk.CTkButton(self.edit_prompt_win, text="Proceed to Edit", fg_color="#12E068", text_color="black", command=submit_lookup).pack(pady=15)
 
+    #Launches the identical form of creation but for editing employee
     def launch_edit_form_window(self, emp_obj):
         """Constructs an editing window looking EXACTLY like open_create_employee_win."""
         self.edit_emp_win = ctk.CTkToplevel(self.winfo_toplevel())
@@ -721,46 +732,39 @@ class HomePageFrame(ctk.CTkFrame):
         self.field_frame = ctk.CTkFrame(self.edit_emp_win, fg_color="#e0e0e0", width=450, height=600)
         self.field_frame.pack(fill="x", padx=5, pady=5)
 
-        # ID Field (Immutable)
         ctk.CTkLabel(self.field_frame, text="ID", text_color="black", font=self.primary_font).grid(row=0, column=0, sticky="w", padx=5, pady=10)
         self.id_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
         self.id_entry.grid(row=0, column=1)
         self.id_entry.insert(0, str(emp_obj.id))
         self.id_entry.configure(state="readonly")
 
-        # Type Dropdown
         ctk.CTkLabel(self.field_frame, text="Type", text_color="black", font=self.primary_font).grid(row=0, column=2, sticky="e", padx=5, pady=10)
         self.emp_dropdown = ctk.CTkComboBox(self.field_frame, values=["Part-Time", "Full-Time"], width=135, state="readonly", font=self.primary_font,
             command=lambda status: [self.handle_emp_status(status), self.update_salary_display(self.position_dropdown.get())])
         self.emp_dropdown.grid(row=0, column=3)
         self.emp_dropdown.set(emp_obj.emp_type)
 
-        # Name Input
         ctk.CTkLabel(self.field_frame, text="Name", text_color="black", font=self.primary_font).grid(row=1, column=0, sticky="w", padx=5, pady=10)
         self.name_entry = ctk.CTkEntry(self.field_frame, width=175, height=30, font=self.primary_font)
         self.name_entry.grid(row=1, column=1)
         self.name_entry.insert(0, emp_obj.name)
 
-        # Gender Dropdown
         ctk.CTkLabel(self.field_frame, text="Gender", text_color="black", font=self.primary_font).grid(row=1, column=2, sticky="e", padx=5, pady=10)
         self.gender_dropdown = ctk.CTkComboBox(self.field_frame, values=["Male", "Female"], width=135, state="readonly", font=self.primary_font)
         self.gender_dropdown.grid(row=1, column=3)
         self.gender_dropdown.set(emp_obj.gender)
 
-        # Department Dropdown
         ctk.CTkLabel(self.field_frame, text="Department", text_color="black", font=self.primary_font).grid(row=2, column=0, sticky="w", padx=5, pady=10)
         self.department_dropdown = ctk.CTkComboBox(self.field_frame, values=list(self.dept_pos_map.keys()), width=250, state="readonly", font=self.primary_font, command=self.update_position_list)
         self.department_dropdown.grid(row=2, column=1, columnspan=2)
         self.department_dropdown.set(emp_obj.department)
 
-        # Position Dropdown
         ctk.CTkLabel(self.field_frame, text="Position", text_color="black", font=self.primary_font).grid(row=3, column=0, sticky="w", padx=5, pady=10)
         initial_positions = self.dept_pos_map.get(emp_obj.department, [])
         self.position_dropdown = ctk.CTkComboBox(self.field_frame, values=initial_positions, width=250, state="readonly", font=self.primary_font, command=self.update_salary_display)
         self.position_dropdown.grid(row=3, column=1, columnspan=2)
         self.position_dropdown.set(emp_obj.position)
 
-        # Salary Information Segment
         ctk.CTkLabel(self.edit_emp_win, text="Salary Information", text_color="black", font=self.primary_font).pack(padx=5, pady=5)
         self.salary_frame = ctk.CTkFrame(self.edit_emp_win, fg_color="#e0e0e0", width=450, height=600)
         self.salary_frame.pack(fill="x", padx=5, pady=5)
@@ -774,7 +778,6 @@ class HomePageFrame(ctk.CTkFrame):
         self.hours_worked_label = ctk.CTkLabel(self.salary_frame, text="Hours Worked", font=self.primary_font)
         self.hours_worked = ctk.CTkEntry(self.salary_frame, width=100, height=30, font=self.primary_font)
 
-        # Populate layout structure state based on standard employment type rules
         if emp_obj.emp_type == "Part-Time":
             self.salary_label.configure(text="Hourly Rate")
             self.hours_worked_label.grid(row=0, column=2, sticky="e", padx=5, pady=10)
@@ -796,14 +799,13 @@ class HomePageFrame(ctk.CTkFrame):
         self.bank_entry.grid(row=2, column=1, columnspan=2, sticky="w", padx=5, pady=10)
         self.bank_entry.insert(0, emp_obj.bank_account)
 
-        # Commit button mapping to local update processor
         self.save_btn = ctk.CTkButton(self.edit_emp_win, text="Update", font=self.primary_font, fg_color="#2196F3", text_color="white",
                                     command=self.handle_edit_employee_data)
         self.save_btn.pack(pady=20)
         self.toplevelwindow = self.save_btn.winfo_toplevel()
 
+    #THis Function THe Editing LOgic
     def handle_edit_employee_data(self):
-        """Validates entry fields and mutates target record values inside files/lists."""
         try:
             manager = self.master.payroll_system
             eid = self.id_entry.get()
@@ -836,7 +838,8 @@ class HomePageFrame(ctk.CTkFrame):
 
         except ValueError:
             messagebox.showerror("Input Error", "Please ensure numeric fields contain valid quantities.", parent=self.edit_emp_win)
-        
+
+#View EMployees Frame
 class ViewEmployeesFrame(ctk.CTkFrame):
     def __init__(self, master, on_back):
         super().__init__(master, fg_color="white")
@@ -885,11 +888,14 @@ class ViewEmployeesFrame(ctk.CTkFrame):
                     font=("Helvetica", 11), 
                     text_color="black").pack(side="left", padx=5)
         
-        self.sort_dropdown = ctk.CTkComboBox(sort_frame, values=["Alphabetical", "Salary", "Department"], command=self.handle_sorting, state="readonly", width=150)
+        self.sort_dropdown = ctk.CTkComboBox(sort_frame, 
+                                            values=["Alphabetical", "Salary", "Department"], 
+                                            command=self.handle_sorting, 
+                                            state="readonly", width=150)
         self.sort_dropdown.pack(side="left", padx=5)
 
         self.checkbox_sort = ctk.CTkCheckBox(
-        sort_frame, # or wherever your sorting controls are
+        sort_frame, 
         text="Reverse", 
         variable=self.reverse_var,
         command=self.handle_sorting
@@ -899,18 +905,18 @@ class ViewEmployeesFrame(ctk.CTkFrame):
                     command=on_back, 
                     width=200, height=40).pack(side="right", padx=5)
 
+    #HAndles Sorting in Gui
     def handle_sorting(self, choice=None):
-        """Handles Sorting"""
         sorter_tool = self.master.sorter
         
         if choice is None:
             choice = self.sort_dropdown.get()
             
         if choice == "Salary":
-            if not self.checkbox_sort.winfo_ismapped(): # Only pack if not already visible
+            if not self.checkbox_sort.winfo_ismapped(): 
                 self.checkbox_sort.pack(side="left", padx=5)   
         else:
-            if self.checkbox_sort.winfo_ismapped(): # Only forget if currently visible
+            if self.checkbox_sort.winfo_ismapped():
                 self.checkbox_sort.pack_forget()
 
         is_reversed = self.reverse_var.get()
@@ -918,7 +924,6 @@ class ViewEmployeesFrame(ctk.CTkFrame):
         original_list = list(self.master.payroll_system.employees)
 
         sorted_list = sorter_tool.merge_sort(original_list, choice, is_reversed)
-        print(f"Sorting triggered for: {choice}")
         self.update_treeview(sorted_list)
 
     def update_treeview(self, employee_list):
@@ -955,7 +960,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                     text="Payroll Management System for Employees", 
                     text_color="black", font=("Helvetica", 20, "bold")).pack(side="top", fill="x")
 
-        # Main Layout Container
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.pack(expand=True, pady=20)
 
@@ -973,28 +977,22 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         ctk.CTkButton(self.left_panel, text="SEARCH", width=100, fg_color="yellow", text_color="black", hover_color="#cccc00", 
                     command=self.handle_search).grid(row=1, column=2, padx=5)
 
-        # Explicitly Defined Entry Fields
-        # Name
         ctk.CTkLabel(self.left_panel, text="EMPLOYEE NAME:", text_color="black", font=self.primary_font).grid(row=2, column=0, padx=10, pady=10, sticky="w")
         self.name_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
         self.name_entry.grid(row=2, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
-        # Gender
         ctk.CTkLabel(self.left_panel, text="GENDER:", text_color="black", font=self.primary_font).grid(row=3, column=0, padx=10, pady=10, sticky="w")
         self.gender_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
         self.gender_entry.grid(row=3, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
-        # Department
         ctk.CTkLabel(self.left_panel, text="DEPARTMENT:", text_color="black", font=self.primary_font).grid(row=4, column=0, padx=10, pady=10, sticky="w")
         self.dept_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
         self.dept_entry.grid(row=4, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
-        # Position
         ctk.CTkLabel(self.left_panel, text="POSITION:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=10, pady=10, sticky="w")
         self.pos_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
         self.pos_entry.grid(row=5, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
-        # Type
         ctk.CTkLabel(self.left_panel, text="TYPE:", text_color="black", font=self.primary_font).grid(row=6, column=0, padx=10, pady=10, sticky="w")
         self.emp_type_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
         self.emp_type_entry.grid(row=6, column=1, columnspan=2, padx=5, pady=10, sticky="w")
@@ -1039,7 +1037,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                                         text="Add to Batch Queue", 
                                         command=self.add_to_pay_queue,
                                         font=("Helvetica", 14),
-                                        fg_color="#e67e22",  # Distinct orange color to separate it from individual generation
+                                        fg_color="#e67e22", 
                                         hover_color="#d35400"
                                     )
         self.add_queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
@@ -1059,7 +1057,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         
         
     def bulk_enqueue_all(self):
-        """Loads all active employees from the system manager directly into the FIFO pipeline."""
+        """Loads all active employees from the system manager directly into the FIFO QUEUE"""
         manager = self.master.payroll_system
         queue = self.master.payroll_queue
         
@@ -1069,12 +1067,10 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             
         counter = 0
         for emp in manager.employees:
-            # Prevent double enqueuing if they are already in the line
             if emp not in queue._queue:
                 queue.enqueue(emp)
                 counter += 1
                 
-        # Immediately refresh status labels
         self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
         messagebox.showinfo("Success", f"Successfully loaded {counter} employees into the Pay-Run sequence!")
 
@@ -1141,19 +1137,16 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
     def add_to_pay_queue(self):
         """Captures current screen state parameters, includes absences metrics, and stages the worker to the batch queue."""
-        # 1. Fetch target ID using your active entry variable name (from our previous fix)
         target_id = self.search_id_entry.get().strip() 
         if not target_id:
             messagebox.showwarning("Input Error", "Please provide a valid Employee ID to stage for batch processing.")
             return
 
-        # 2. Fetch the worker reference from core system memory
         emp = self.master.payroll_system.search_employee_by_id(target_id)
         if not emp:
             messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
             return
 
-        # 3. Read and parse the absences entry box input cleanly
         absences_input = 0.0
         if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
             try:
@@ -1162,22 +1155,16 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 messagebox.showerror("Typing Error", "Absences field must contain a valid number or remain empty.")
                 return
 
-        # 4. Bind the active absences amount to this employee object session wrapper
-        # This guarantees that when the queue pops the record later, the math remembers these absences!
         emp.staged_absences = absences_input
 
-        # 5. Push the configured instance onto your central FIFO algorithm data structure queue
         self.master.payroll_queue.enqueue(emp)
 
-        # 6. Inform the user and clear out inputs for the next employee search entry
         messagebox.showinfo("Queue Success", f"Employee {emp.name} (ID: {emp.id}) with {absences_input} absences has been staged in the batch run queue.")
         
-        # Optional: Reset entry inputs automatically so the admin can type the next ID immediately
         self.search_id_entry.delete(0, 'end')
         if hasattr(self, 'absent_entry'):
             self.absent_entry.delete(0, 'end')
             
-        # Update your queue layout metrics tracker label on your screen dashboard if you have one
         if hasattr(self, 'queue_status_label'):
             queue_size = self.master.payroll_queue.get_size()
             self.queue_status_label.configure(text=f"Queue: {queue_size} Employees")
@@ -1238,7 +1225,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 self.net_salary_entry.delete(0, 'end')
                 self.net_salary_entry.insert(0, f"{pay_data['net']:.2f}")
 
-            # 4. Trigger the visual slip window, passing the exact calculated tokens
+
             self.display_payslip(emp, pay_data, current_date)
 
         except ValueError:
@@ -1252,8 +1239,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.resizable(False, False)
         slip_toplevel.configure(fg_color="white")
         current_date = datetime.datetime.now().strftime("%B %d, %Y")
-
-        # Light Green Banner
+        
         banner = ctk.CTkFrame(slip_toplevel, fg_color="#c2f0d1", corner_radius=0, height=40)
         banner.pack(fill="x", side="top")
         ctk.CTkLabel(banner, text="Payroll Management System for Employees", text_color="black").pack(pady=5)
@@ -1261,7 +1247,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         container = ctk.CTkFrame(slip_toplevel, fg_color="white")
         container.pack(expand=True, fill="both", padx=40, pady=20)
 
-        # Header Title
         ctk.CTkLabel(container, text=f"SALARY SLIP FOR {datetime.datetime.now().strftime('%B %Y').upper()}", 
                     text_color="black", font=("Helvetica", 24, "bold")).pack()
         ctk.CTkFrame(container, height=2, fg_color="black").pack(fill="x", pady=10)
@@ -1352,7 +1337,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             messagebox.showwarning("Empty Queue", "There are no pending employees in the pay-run queue.")
             return
 
-        processed_slips = []  # Keeps track of slips generated in this specific batch run
+        processed_slips = []
         current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
         while not queue.is_empty():
@@ -1381,7 +1366,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             final_sss = pay_data["sss"]
             final_pag = pay_data["pag"]
             
-            # 1. Save directly to your text storage ledger
             self.master.file_handler.save_salary_slip_record(
                 str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
                 pay_data["reg_pay"], pay_data["ot_pay"], final_gross,
@@ -1389,7 +1373,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 final_absent, final_net, current_date
             )
 
-            # 2. Sync to local runtime Linked List reporting structure
             self.master.salary_records.add_record(str(emp.id), emp.name, final_net)
 
             processed_slips.append({
@@ -1416,7 +1399,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         if hasattr(self, 'queue_status_label'):
             self.queue_status_label.configure(text="Queue: 0 Employees")
 
-        # Open the single dashboard window showing the batch items cleanly
         self.open_batch_summary_window(processed_slips)
 
     def open_batch_summary_window(self, slips_list):
@@ -1428,24 +1410,20 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         summary_win.configure(fg_color="#f5f5f5")
         summary_win.attributes("-topmost", True)
 
-        # Banner Header
         banner = ctk.CTkFrame(summary_win, fg_color="#c2f0d1", corner_radius=0, height=50)
         banner.pack(fill="x", side="top")
         ctk.CTkLabel(banner, text=f"Batch Run Complete: Processed {len(slips_list)} Slips Successfully", 
                     text_color="black", font=("Helvetica", 16, "bold")).pack(pady=10)
 
-        # Main Split Body Layout Frame
         main_body = ctk.CTkFrame(summary_win, fg_color="transparent")
         main_body.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # Left Column Frame: The List Selection Pane
         left_pane = ctk.CTkFrame(main_body, width=300, fg_color="white", border_color="#d3d3d3", border_width=1)
         left_pane.pack(side="left", fill="both", padx=(0, 10))
         left_pane.pack_propagate(False)
         
         ctk.CTkLabel(left_pane, text="Select Employee to View Slip", font=("Helvetica", 13, "bold"), text_color="black").pack(pady=10)
 
-        # Right Column Frame: The Live View Details Card
         right_pane = ctk.CTkFrame(main_body, fg_color="white", border_color="#d3d3d3", border_width=1)
         right_pane.pack(side="right", fill="both", expand=True)
 
@@ -1454,13 +1432,11 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             for widget in right_pane.winfo_children():
                 widget.destroy()
 
-            # Slip Header View Area
             ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {slip['date']}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
             
             info_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
             info_frame.pack(fill="x", padx=30, pady=5)
             
-            # Use data straight out of the snapshot block token dictionary, bypassing active entry fields!
             self._create_slip_row(info_frame, "EMPLOYEE NAME:", slip['name'])
             self._create_slip_row(info_frame, "EMPLOYEE ID:", slip['id'])
             self._create_slip_row(info_frame, "DEPARTMENT:", slip['dept'])
@@ -1476,13 +1452,11 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             self._create_slip_row(money_frame, "GROSS BASE PAY:", f"Php {slip['gross']:,.2f}")
             self._create_slip_row(money_frame, "STATUTORY DEDUCTIONS:", f"Php {(slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip["absent"]):,.2f}")
             
-            # Net Cash Takehome Footer Panel
             net_box = ctk.CTkFrame(right_pane, fg_color="#90ee90", corner_radius=4)
             net_box.pack(fill="x", padx=30, pady=20, side="bottom")
             ctk.CTkLabel(net_box, text=f"NET SALARY RECEIVED: Php {slip['net']:,.2f}", 
                         text_color="black", font=("Helvetica", 16, "bold")).pack(pady=12)
 
-        # Populate Left List Panel with interactive clickable target buttons
         scroll_container = ctk.CTkScrollableFrame(left_pane, fg_color="transparent")
         scroll_container.pack(fill="both", expand=True, padx=5, pady=5)
 
@@ -1499,7 +1473,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             )
             btn.pack(fill="x", pady=4, padx=5)
 
-        # Automatically open the details page for the very first employee in the list initially
+
         if slips_list:
             populate_slip_details(slips_list[0])
 
@@ -1509,7 +1483,6 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         self.master = master
         self.on_back = on_back
 
-        # Top Header Banner
         banner = ctk.CTkFrame(self, fg_color="#c2f0d1", height=60, corner_radius=0)
         banner.pack(fill="x", side="top")
         
@@ -1517,9 +1490,8 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                     text_color="black", font=("Helvetica", 20, "bold")).pack(side="left", padx=20, pady=15)
         
         ctk.CTkButton(banner, text="Back to Dashboard", fg_color="#333333", hover_color="#555555",
-                      command=self.on_back).pack(side="right", padx=20, pady=15)
+                    command=self.on_back).pack(side="right", padx=20, pady=15)
 
-        # Control panel for Searching
         control_panel = ctk.CTkFrame(self, fg_color="white", height=60, corner_radius=4)
         control_panel.pack(fill="x", padx=20, pady=(15, 0))
         
@@ -1530,25 +1502,20 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=5, pady=15)
         self.search_entry.bind("<KeyRelease>", lambda e: self.load_records_table())
 
-        # Main Scrollable Data Container
         self.table_container = ctk.CTkScrollableFrame(self, fg_color="white", label_text="Issued Payslip Ledger Matrix")
         self.table_container.configure(label_text_color="black", label_font=("Helvetica", 14, "bold"))
         self.table_container.pack(fill="both", expand=True, padx=20, pady=15)
 
-        # Build headers and load data matrix
         self.load_records_table()
 
     def load_records_table(self):
         """Clears old rows and reads database dictionaries to populate historical listings."""
-        # Clear previous items
         for widget in self.table_container.winfo_children():
             widget.destroy()
 
-        # Define Explicit Table Grid Column Metadata Headers
         headers = ["Date", "ID", "Name", "Department", "Gross Pay", "Deductions", "Net Salary"]
         widths = [120, 80, 180, 150, 120, 120, 120]
 
-        # Draw Header Row on Screen
         header_row = ctk.CTkFrame(self.table_container, fg_color="#e0e0e0", corner_radius=0)
         header_row.pack(fill="x", pady=(0, 5))
 
@@ -1556,28 +1523,22 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
             lbl = ctk.CTkLabel(header_row, text=text, width=w, font=("Helvetica", 12, "bold"), text_color="black", anchor="w")
             lbl.pack(side="left", padx=10, pady=8)
 
-        # Pull raw token collection from database tier
         all_slips = self.master.file_handler.get_all_salary_slips()
         search_filter = self.search_entry.get().strip()
 
         row_counter = 0
 
-        # Loop through dictionary mapping schemas
         for emp_id, slips in all_slips.items():
-            # Apply search filter matching constraints dynamically
             if search_filter and search_filter not in str(emp_id):
                 continue
 
             for slip in slips:
-                # Alternate row highlight backgrounds for grid scanning readability
                 bg_color = "#fdfdfd" if row_counter % 2 == 0 else "#f1f3f5"
                 row_frame = ctk.CTkFrame(self.table_container, fg_color=bg_color, corner_radius=0)
                 row_frame.pack(fill="x", pady=1)
 
-                # Sum the structural deductions lines accurately 
                 total_deductions = slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip['absent']
 
-                # Format elements to display in the grid
                 data_fields = [
                     slip['date'],
                     emp_id,

@@ -175,14 +175,11 @@ class PayrollSystemManager:
         emp = self.search_employee_by_id(id)
         if emp:
             if emp.emp_type != "Full-Time":
-                # Create a fresh FullTimeEmployee replacement object instance
                 new_emp = FullTimeEmployee(id, name, gender, department, position, hire_date, float(salary), email, bank_account)
-                
-                # Find the index position of the old object and swap it in memory
+            
                 idx = self.employees.index(emp)
                 self.employees[idx] = new_emp
             else:
-                # Standard property updating if type remains the same
                 emp.name = name
                 emp.gender = gender
                 emp.department = department
@@ -200,16 +197,12 @@ class PayrollSystemManager:
         """Updates an existing Part-Time Employee's records."""
         emp = self.search_employee_by_id(id)
         if emp:
-            # Check if we are changing types from Full-Time to Part-Time
             if emp.emp_type != "Part-Time":
-                # Create a fresh PartTimeEmployee replacement object instance
                 new_emp = PartTimeEmployee(id, name, gender, department, position, hire_date, float(hours_worked), float(hourly_rate), email, bank_account)
                 
-                # Find the index position of the old object and swap it in memory
                 idx = self.employees.index(emp)
                 self.employees[idx] = new_emp
             else:
-                # Standard property updating if type remains the same
                 emp.name = name
                 emp.gender = gender
                 emp.department = department

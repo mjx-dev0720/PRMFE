@@ -78,16 +78,13 @@ class PayrollAlgo:
             attr = "name"
 
         while len(left) > 0 and len(right) > 0:
-            # CRITICAL FIX: Route salary sorting requests dynamically through the custom getter methods
             if attr == "salary":
                 val1 = left[0].get_salary()
                 val2 = right[0].get_salary()
             else:
-                # Use standard object checks fallback mappings to grab public attributes safely without breaching private bounds
                 val1 = getattr(left[0], attr) if hasattr(left[0], attr) else ""
                 val2 = getattr(right[0], attr) if hasattr(right[0], attr) else ""
 
-            # Standardize structural evaluations against mixed case variations
             v1 = val1.lower() if isinstance(val1, str) else val1
             v2 = val2.lower() if isinstance(val2, str) else val2
 
@@ -101,7 +98,6 @@ class PayrollAlgo:
             else:
                 result.append(right.pop(0))
 
-        # Pull remaining elements out from processing sequences
         while len(left) > 0:
             result.append(left.pop(0))
         while len(right) > 0:

@@ -1,5 +1,4 @@
 import os
-import datetime
 
 
 class PayrollDataFileHandling:
@@ -89,7 +88,6 @@ class PayrollDataFileHandling:
         This guarantees data consistency even if rates change in the future.
         """
         try:
-            # Format numbers to 2 decimal places cleanly
             line = (
                 f"{date}|{emp_id}|{name}|{dept}|{pos}|{emp_type}|"
                 f"{reg_pay:.2f}|{ot_pay:.2f}|{gross:.2f}|"
@@ -118,7 +116,6 @@ class PayrollDataFileHandling:
                     tokens = line.strip().split("|")
                     if len(tokens) >= 15:
                         emp_id = tokens[1]
-                        # Group slips under each employee ID if they have multiple pay periods
                         if emp_id not in slips_collection:
                             slips_collection[emp_id] = []
                         
