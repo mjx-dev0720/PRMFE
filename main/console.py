@@ -2,6 +2,7 @@ from db_handling import *
 from dsa_algo import *
 from payroll_sys import *
 import datetime
+import time
 
 #Console Based System
 
@@ -91,9 +92,9 @@ def main():
                 rate = float(input("Enter Hourly Rate (Php): "))
                 hours = float(input("Enter Regular Clocked Hours: "))
                 PAYROLL_SYS.add_parttime_employee(id, name, gender, dept, pos, current_date, hours, rate, email, bank)
-                print(f"[Success] PartTimeEmployee registered with ID: {id}")
+                print(f"\n[Success] PartTimeEmployee registered with ID: {id}\n")
             else:
-                print("ERROR: Index Error")
+                print("\nERROR: Index Error\n")
                     
         elif choice == 2:
             if not EMPLOYEES_LIST:
@@ -355,34 +356,39 @@ def main():
                     )
                 except Exception as db_err:
                     pass
-                    
-                print(f" -> Processed: ID {emp.id:<5} | {emp.name:<25} |Sending to Bank Account: {emp.bank_account} -> PAID: ₱{net:>10,.2f}")
+
+                print(f"\nProcessing:...\nSending to Bank Account: {emp.bank_account} -> PAID: ₱{net:>10,.2f}")
+                time.sleep(1)
+                print(f"-> Processed: #{emp.id:<5} | {emp.name:<25}")
+                print("=" * 50)
                 processed_count += 1
 
+            print("\n")
             print("="*50)
-            print(f"[Success] Batch Run Complete! {processed_count} execution records committed.")
+            print(f"[Success] Payroll Batch Run Complete! {processed_count} employees have been paid.")
             print("="*50)
             print("\n")
             continue
 
         elif choice == 8:
-            print("\n" + "="*60)
+            log_count = 0
+            print("\n" + "="*65)
             print("                  EMPLOYEE SALARY HISTORY                  ")
-            print("="*60)
-
+            print("="*65)
         
             history_logs = SALARY_HISTORY.display_all()
-            print(f"{"ID":<8} {"NAME":<30} {"PAID":<12}")
+            print(f"       {"ID":<11} {"NAME":<33} {"PAID":<15}")
 
             if not history_logs:
-                print("[Notice] No historical salary slip transactions found.")
+                print("[Notice] No salary transactions found.")
             else:
                 for log in history_logs:
-                    print(log)
+                    log_count += 1
+                    print(f"#{log_count:<5} {log}")
                         
-            print("-" * 60)
-            print(f"Total historical entries in Linked List: {len(history_logs)}")
-            print("="*60 + "\n")
+            print("-" * 65)
+            print(f"Total transaction entries in Salary Record(Linked List): {len(history_logs)}")
+            print("="*65 + "\n")
             continue
 
 

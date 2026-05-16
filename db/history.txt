@@ -194,3 +194,110 @@ May 14, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect
 May 14, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|24300.00|45900.00|5508.00|2295.00|1836.00|918.00|0.00|35343.00
 May 14, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
 May 14, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|13950.00|26350.00|3162.00|1317.50|1054.00|527.00|0.00|20289.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|0.00|73150.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|0.00|38808.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|7800.00|23800.00|2856.00|1190.00|952.00|476.00|0.00|18326.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|33250.00|0.00|33250.00|3990.00|1662.50|1330.00|665.00|0.00|25602.50
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|4650.00|17050.00|2046.00|852.50|682.00|341.00|0.00|13128.50
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|23040.00|15768.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|0.00|28800.00|3456.00|1440.00|1152.00|576.00|23040.00|-864.00
+May 16, 2026|1|Marc Jay Sumayaw|IT Infrastructure & Cloud|Cloud Architect|Full-Time|95000.00|0.00|95000.00|11400.00|4750.00|3800.00|1900.00|8636.36|64513.64
+May 16, 2026|3|Jose Albert Ray Pasia|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|60800.00|-31540.00
+May 16, 2026|2|Marc Emerson Chavez|Support & Operations|UI/UX Developer|Full-Time|50000.00|0.00|50000.00|6000.00|2500.00|2000.00|1000.00|0.00|38500.00
+May 16, 2026|6|Emjay Flores|Human Resources|Training Specialist|Part-Time|16000.00|0.00|16000.00|1920.00|800.00|640.00|320.00|0.00|12320.00
+May 16, 2026|1001|Naruto Uzumaki|Data & Security|Cybersecurity Analyst|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1002|Daniel Padilla|IT Infrastructure & Cloud|Cloud Architect|Full-Time|75000.00|0.00|75000.00|9000.00|3750.00|3000.00|1500.00|0.00|57750.00
+May 16, 2026|1004|Marc Justine De Vera|IT Infrastructure & Cloud|Cloud Architect|Part-Time|38000.00|0.00|38000.00|4560.00|1900.00|1520.00|760.00|0.00|29260.00
+May 16, 2026|1008|Darren Espanto|Human Resources|Compensation Analyst|Part-Time|21600.00|0.00|21600.00|2592.00|1080.00|864.00|432.00|0.00|16632.00
+May 16, 2026|1011|JunJun Mendoza|Support & Operations|UI/UX Developer|Full-Time|45240.00|0.00|45240.00|5428.80|2262.00|1809.60|904.80|0.00|34834.80
+May 16, 2026|1012|Rowie Montero|IT Infrastructure & Cloud|IT Helpdesk|Part-Time|12400.00|0.00|12400.00|1488.00|620.00|496.00|248.00|0.00|9548.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|11520.00|27288.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|23040.00|15768.00
+May 16, 2026|4|Gericho De Castro|IT Infrastructure & Cloud|Cloud Architect|Part-Time|28800.00|21600.00|50400.00|6048.00|2520.00|2016.00|1008.00|23040.00|15768.00

@@ -258,9 +258,10 @@ class HomePageFrame(ctk.CTkFrame):
         self.create_emp.title("Creating Employee")
         self.create_emp.geometry("500x700")
         self.create_emp.configure(fg_color="#e0e0e0")
+        self.create_emp.resizable(False, False)
         self.create_emp.deiconify()
 
-        self.create_emp.protocol("WM_DELETE_WINDOW", self.event_exit_create_win)
+        self.create_emp.protocol("WM_DELETE_WINDOW", self.event_exit_win)
 
         self.dept_pos_map = {
                 "Human Resources": [
@@ -487,7 +488,7 @@ class HomePageFrame(ctk.CTkFrame):
             self.hours_worked.grid_forget()
 
     #Safety Net if someone accidently close the window while creating
-    def event_exit_create_win(self):
+    def event_exit_win(self):
         if self.name_entry.get() != "":
             if messagebox.askyesno("Exit", "You have unsaved data. Are you sure you want to close this window?"):
                 self.create_emp.destroy()
@@ -569,6 +570,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.del_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.del_win.title("Delete Employee")
         self.del_win.geometry("400x250")
+        self.del_win.resizable(False, False)
         self.del_win.attributes("-topmost", True)
 
         ctk.CTkLabel(self.del_win, text="Remove Employee", font=("Helvetica", 24, "bold")).pack(pady=20)
@@ -619,6 +621,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.search_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.search_win.title("Search Employee")
         self.search_win.geometry("400x600")
+        self.search_win.resizable(False, False)
         self.search_win.attributes("-topmost", True)
 
         ctk.CTkLabel(self.search_win, text="Employee Search", font=("Helvetica", 24, "bold")).pack(pady=20)
@@ -702,6 +705,7 @@ class HomePageFrame(ctk.CTkFrame):
         self.edit_emp_win.title("Editing Employee Records")
         self.edit_emp_win.geometry("500x700")
         self.edit_emp_win.configure(fg_color="#e0e0e0")
+        self.edit_emp_win.resizable(False, False)
         self.edit_emp_win.deiconify()
 
         self.dept_pos_map = {
