@@ -1,4 +1,4 @@
-1|Marc Jay Sumayaw|Male|IT Infrastructure & Cloud|Cloud Architect|July 09, 2024|mjs@g.com|2341-3142-3525|Full-Time|95000.0|0|0
+1|Marc Jay Sumayaw|Male|IT Infrastructure & Cloud|Cloud Architect|July 09, 2024|mjjs@gm.com|2341-3142-3522|Full-Time|95000.0|0|0
 2|Marc Emerson Chavez|Male|Support & Operations|UI/UX Developer|May 05, 2025|marcemer@g.com|3253-5436-6574|Full-Time|50000.0|0|0
 3|Jose Albert Ray Pasia|Male|IT Infrastructure & Cloud|Cloud Architect|September 25, 2025|jray@g.com|3234-5477-6585|Part-Time|38000.0|40.0|950.0
 4|Gericho De Castro|Male|IT Infrastructure & Cloud|Cloud Architect|May 14, 2026|ggdecastro@g.com|2194-3256-5488|Part-Time|43200.0|60.0|720.0
@@ -9,3 +9,6 @@
 1008|Darren Espanto|Male|Human Resources|Compensation Analyst|May 14, 2026|darreng@g.com|2352-6457-5747|Part-Time|21600.0|40.0|540.0
 1011|JunJun Mendoza|Male|Support & Operations|UI/UX Developer|May 14, 2026|junjunm@g.com|3294-3256-5747|Full-Time|45240.0|0|0
 1012|Rowie Montero|Male|IT Infrastructure & Cloud|IT Helpdesk|May 14, 2026|rowrowmon@g.com|3056-6346-3462|Part-Time|15500.0|50.0|310.0
+1014|Raffy Tulfo|Male|Data & Security|AI Engineer|May 20, 2026|raffy@g.com|1243-3141-1341|Full-Time|85000.0|0|0
+1015|Xavier Alexander|Male|Engineering & Development|QA Automation Engineer|May 20, 2026|xvirealex@g.com|3241-3152-3252|Part-Time|21500.0|43.0|500.0
+1016|Joji|Female|Support & Operations|Operations Coordinator|May 20, 2026|21@don.com|2214-3256-5373|Full-Time|38000.0|0|0

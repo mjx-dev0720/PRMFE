@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 from payroll_sys import *
 from db_handling import PayrollDataFileHandling
 import datetime
+import calendar
 from dsa_algo import *
 
 #Admin Login Frame
@@ -437,7 +438,7 @@ class HomePageFrame(ctk.CTkFrame):
                     font=self.primary_font
                     ).grid(row=2, column=0, sticky="w", padx=5, pady=10)
 
-        self.bank_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font)
+        self.bank_entry = ctk.CTkEntry(self.salary_frame, width=235, height=30, font=self.primary_font, placeholder_text="XXXX-XXXX-XXXX")
         self.bank_entry.grid(row=2, column=1, columnspan=2, sticky="w", padx=5, pady=10)
 
 
@@ -522,6 +523,34 @@ class HomePageFrame(ctk.CTkFrame):
                 self.toplevelwindow.lift()
                 self.toplevelwindow.focus_force()
                 return
+            
+            if "@" not in email or email.count("@") != 1:
+                messagebox.showerror("Validation Error", "Invalid Email: Must contain exactly one '@' symbol.")
+                self.email_entry.focus()
+                return
+
+            prefix, domain = email.split("@")
+
+            if not prefix or not domain or "." not in domain or domain.startswith(".") or domain.endswith("."):
+                messagebox.showerror("Validation Error", "Invalid Email: Ensure domain structure is correct (e.g., domain.com).")
+                self.email_entry.focus()
+                return
+
+            if " " in email:
+                messagebox.showerror("Validation Error", "Invalid Email: Spaces are not allowed.")
+                self.email_entry.focus()
+                return 
+            
+            if len(bank_account) != 14 or bank_account.count("-") != 2:
+                messagebox.showerror(
+                    "Validation Error", 
+                    f"Invalid Account Format!\n\n"
+                    f"Current: {bank_account}\n"
+                    f"Expected: XXXX-XXXX-XXXX (Must be exactly 12 digits long)."
+                )
+                self.bank_entry.focus()
+                return
+            
             
             #auto incrementing id system
             emp_id = self.master.file_handler.commit_next_id()
@@ -827,6 +856,33 @@ class HomePageFrame(ctk.CTkFrame):
             if not all([eid, name, gender, dep, pos, emp_type, email, bank_account]):
                 messagebox.showerror("Error", "Please fill in all empty fields.", parent=self.edit_emp_win)
                 return
+            
+            if "@" not in email or email.count("@") != 1:
+                messagebox.showerror("Validation Error", "Invalid Email: Must contain exactly one '@' symbol.")
+                self.email_entry.focus()
+                return
+
+            prefix, domain = email.split("@")
+
+            if not prefix or not domain or "." not in domain or domain.startswith(".") or domain.endswith("."):
+                messagebox.showerror("Validation Error", "Invalid Email: Ensure domain structure is correct (e.g., domain.com).")
+                self.email_entry.focus()
+                return
+
+            if " " in email:
+                messagebox.showerror("Validation Error", "Invalid Email: Spaces are not allowed.")
+                self.email_entry.focus()
+                return 
+            
+            if len(bank_account) != 14 or bank_account.count("-") != 2:
+                messagebox.showerror(
+                    "Validation Error", 
+                    f"Invalid Account Format!\n\n"
+                    f"Current: {bank_account}\n"
+                    f"Expected: XXXX-XXXX-XXXX (Must be exactly 12 digits long)."
+                )
+                self.bank_account_entry.focus()
+                return
 
             if emp_type == "Part-Time":
                 hours = float(self.hours_worked.get())
@@ -1016,6 +1072,9 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.monthly_salary_label = ctk.CTkLabel(self.right_panel, text="Monthly Salary:", font=self.primary_font)
         self.monthly_salary_entry = ctk.CTkEntry(self.right_panel, width=150)
 
+        self.ot_hours_label = ctk.CTkLabel(self.right_panel, text="Overtime Hours:", font=self.primary_font)
+        self.ot_hours_entry = ctk.CTkEntry(self.right_panel, placeholder_text="e.g., 10", width=150)
+
         self.rate_label = ctk.CTkLabel(self.right_panel, text="Rate / Hour:", font=self.primary_font)
         self.rate_entry = ctk.CTkEntry(self.right_panel, width=150)
 
@@ -1030,7 +1089,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
         ctk.CTkLabel(self.right_panel, text="Absenses:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=20, pady=10, sticky="w")
         self.absent_entry = ctk.CTkEntry(self.right_panel, width=150)
-        self.absent_entry.grid(row=5, column=1, sticky="w")
+        self.absent_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
 
         self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, width=120, fg_color="#12E068", 
                                         text_color="black", font=self.primary_font, command=self.compute_payroll)
@@ -1116,6 +1175,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 
                 self.monthly_salary_label.grid(row=2, column=0, padx=20, pady=10, sticky="w")
                 self.monthly_salary_entry.grid(row=2, column=1, sticky="w")
+                self.ot_hours_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+                self.ot_hours_entry.grid(row=3, column=1, padx=10, pady=5, sticky="w")
                 self.monthly_salary_entry.configure(state="normal") 
                 self.monthly_salary_entry.delete(0, "end")
                 self.monthly_salary_entry.insert(0, str(emp.get_salary()))
@@ -1124,6 +1185,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             else:
                 self.monthly_salary_label.grid_remove()
                 self.monthly_salary_entry.grid_remove()
+                self.ot_hours_label.grid_remove()
+                self.ot_hours_entry.grid_remove()
                 
                 self.rate_label.grid(row=2, column=0, padx=20, pady=10, sticky="w")
                 self.rate_entry.grid(row=2, column=1, sticky="w")
@@ -1147,11 +1210,15 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             return
 
         emp = self.master.payroll_system.search_employee_by_id(target_id)
+
+        ot_val = 0.0
+        absences_input = 0
+        days_val = 22
+
         if not emp:
             messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
             return
 
-        absences_input = 0.0
         if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
             try:
                 absences_input = float(self.absent_entry.get().strip())
@@ -1160,26 +1227,60 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 return
 
         emp.staged_absences = absences_input
+        
+        if hasattr(self, 'days_entry') and self.days_entry.get().strip():
+            try:
+                days_val = int(self.days_entry.get().strip())
+            except ValueError:
+                messagebox.showerror("Typing Error", "Days field must contain a valid integer.")
+                return
+        emp.staged_days_in_month = days_val
+
+        if emp.emp_type == "Part-Time" and hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
+            try:
+                emp.staged_hours = float(self.hours_entry.get().strip())
+            except ValueError:
+                messagebox.showerror("Typing Error", "Hours Worked field must contain a valid number.")
+                return
+            
+        if emp.emp_type == "Full-Time":
+            if hasattr(self, 'ot_hours_entry') and self.ot_hours_entry.get().strip():
+                try:
+                    ot_val = float(self.ot_hours_entry.get().strip())
+                except ValueError:
+                    messagebox.showerror("Typing Error", "Overtime Hours field must contain a valid numeric number.")
+                    return
+            else:
+                ot_val = 0.0
+            
+        emp.staged_ot_hours = ot_val
 
         self.master.payroll_queue.enqueue(emp)
 
-        messagebox.showinfo("Queue Success", f"Employee {emp.name} (ID: {emp.id}) with {absences_input} absences has been staged in the batch run queue.")
+        messagebox.showinfo("Queue Success", f"Employee {emp.name} (ID: {emp.id}) with {absences_input:.0f} absences has been staged in the batch run queue.")
         
         self.search_id_entry.delete(0, 'end')
         if hasattr(self, 'absent_entry'):
             self.absent_entry.delete(0, 'end')
+        if hasattr(self, 'hours_entry'):
+            self.hours_entry.delete(0, 'end')
+        if hasattr(self, 'ot_hours_entry'):
+            self.ot_hours_entry.delete(0, 'end')
             
         if hasattr(self, 'queue_status_label'):
             queue_size = self.master.payroll_queue.get_size()
             self.queue_status_label.configure(text=f"Queue: {queue_size} Employees")
-
-        
 
     def compute_payroll(self):
         """Computes Singe Payroll"""
         import datetime
         try:
             target_id = self.search_id_entry.get().strip()
+
+            hours_val = None
+            absences_input = 0
+            ot_val = 0
+
             if not target_id:
                 messagebox.showwarning("Input Error", "Please provide a valid Employee ID to run payroll calculations.")
                 return
@@ -1189,7 +1290,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
                 return
 
-            absences_input = 0
             if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
                 try:
                     absences_input = float(self.absent_entry.get().strip())
@@ -1199,7 +1299,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
             current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
-            hours_val = None
             if emp.emp_type == "Part-Time":
                 if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
                     try:
@@ -1210,7 +1309,17 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 else:
                     hours_val = getattr(emp, 'hours_worked', 40.0)
 
-            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_input)
+            if emp.emp_type == "Full-Time":
+                if hasattr(self, 'ot_hours_entry') and self.ot_hours_entry.get().strip():
+                    try:
+                        ot_val = float(self.ot_hours_entry.get().strip())
+                    except ValueError:
+                        messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
+                        return
+                else:
+                    ot_val = 0
+
+            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_input, ot_hours=ot_val)
 
 
             self.master.file_handler.save_salary_slip_record(
@@ -1221,6 +1330,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, pay_data["net"])
+
             if hasattr(self, 'gross_salary_entry'):
                 self.gross_salary_entry.delete(0, 'end')
                 self.gross_salary_entry.insert(0, f"{pay_data['gross']:.2f}")
@@ -1242,7 +1352,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.geometry("900x750")
         slip_toplevel.resizable(False, False)
         slip_toplevel.configure(fg_color="white")
-        current_date = datetime.datetime.now().strftime("%B %d, %Y")
+        current_date = datetime.datetime.now()
         
         banner = ctk.CTkFrame(slip_toplevel, fg_color="#c2f0d1", corner_radius=0, height=40)
         banner.pack(fill="x", side="top")
@@ -1274,7 +1384,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         ctk.CTkLabel(right_box, text="SALARY DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
         if emp.emp_type == "Part-Time":
             self._create_slip_row(right_box, "HOURLY RATE", f"Php {emp.hourly_rate:,.2f}")
-            self._create_slip_row(right_box, "HOURS WORKED", f"{emp.hours_worked} hrs")
+            self._create_slip_row(right_box, "HOURS WORKED", f"{emp.hours_worked:.0f} hrs")
         self._create_slip_row(right_box, "REGULAR PAY", f"Php {pay_data['reg_pay']:,.2f}")
         self._create_slip_row(right_box, "OVERTIME", f"Php {pay_data['ot_pay']:,.2f}")
         self._create_slip_row(right_box, "GROSS SALARY", f"Php {pay_data['gross']:,.2f}")
@@ -1287,10 +1397,10 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         deduct_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
         deduct_container.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
         ctk.CTkLabel(deduct_container, text="DEDUCTIONS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
-        self._create_slip_row(deduct_container, "VAT (12%)", f"Php {pay_data['vat']:,.2f}")
-        self._create_slip_row(deduct_container, "PHILHEALTH (5%)", f"Php {pay_data['ph']:,.2f}")
-        self._create_slip_row(deduct_container, "SSS (4%)", f"Php {pay_data['sss']:,.2f}")
-        self._create_slip_row(deduct_container, "PAG-IBIG (2%)", f"Php {pay_data['pag']:,.2f}")
+        self._create_slip_row(deduct_container, "WITHHOLDING TAX", f"Php {pay_data['vat']:,.2f}")
+        self._create_slip_row(deduct_container, "PHILHEALTH", f"Php {pay_data['ph']:,.2f}")
+        self._create_slip_row(deduct_container, "SSS", f"Php {pay_data['sss']:,.2f}")
+        self._create_slip_row(deduct_container, "PAG-IBIG", f"Php {pay_data['pag']:,.2f}")
         self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {pay_data['absent']:,.2f}")
         total_ded = pay_data['vat'] + pay_data['ph'] + pay_data['sss'] + pay_data['pag'] + pay_data['absent']
         self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {total_ded:,.2f}")
@@ -1300,10 +1410,14 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         additional_container.pack(side="right", anchor="n", expand=True, fill="x")
         ctk.CTkLabel(additional_container, text="ADDITIONAL DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
         
-        end_date = datetime.datetime.now() + datetime.timedelta(days=30)
-        self._create_slip_row(additional_container, "PAYMENT DATE", current_date)
-        self._create_slip_row(additional_container, "PAY PERIOD", f"{current_date} - {end_date.strftime('%b %d, %Y')}")
+        pay_period_start = current_date.replace(day=1)
+        _, last_day = calendar.monthrange(current_date.year, current_date.month)
+        pay_period_end = current_date.replace(day=last_day)
+        pay_date = pay_period_end + datetime.timedelta(days=15)
+        self._create_slip_row(additional_container, "PAYMENT DATE", pay_date.strftime('%b %d, %Y'))
+        self._create_slip_row(additional_container, "PAY PERIOD", f"{pay_period_start.strftime('%b %d, %Y')} - {pay_period_end.strftime('%b %d, %Y')}")
         self._create_slip_row(additional_container, "JOIN DATE", f"{emp.hire_date}")
+        self._create_slip_row(additional_container, "BANK ACCOUNT", f"{emp.bank_account}")
 
         # --- SECTION 3: FOOTER (NET SALARY) ---
         footer_spacer = ctk.CTkFrame(container, fg_color="transparent", height=40)
@@ -1342,24 +1456,29 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             return
 
         processed_slips = []
-        current_date = datetime.datetime.now().strftime("%B %d, %Y")
+        current_date = datetime.datetime.now()
+
+        pay_period_start = current_date.replace(day=1)
+        _, last_day = calendar.monthrange(current_date.year, current_date.month)
+        pay_period_end = current_date.replace(day=last_day)
+        pay_date = pay_period_end + datetime.timedelta(days=15)
 
         while not queue.is_empty():
             emp = queue.dequeue()
 
             absences_to_charge = getattr(emp, 'staged_absences', 0.0)
+            days_val = getattr(emp, 'staged_days_in_month', 22)
+            ot_val = getattr(emp, 'staged_ot_hours', 0.0)
+            hours_val = getattr(emp, 'staged_hours', 0.0)
+            if hours_val == 0.0:
+                hours_val = getattr(emp, 'hours_worked', 40.0)
             
-            hours_val = None
-            if emp.emp_type == "Part-Time":
-                if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
-                    try:
-                        hours_val = float(self.hours_entry.get().strip())
-                    except ValueError:
-                        messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
-                        return
-                else:
-                    hours_val = getattr(emp, 'hours_worked', 40.0)
-            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_val, absences_count=absences_to_charge)
+            if emp.emp_type == "Full-Time":
+                hours_override_param = float(days_val)
+            else:  # Part-Time
+                hours_override_param = hours_val
+
+            pay_data = emp.calculate_payroll_breakdown(hours_override=hours_override_param, absences_count=int(absences_to_charge), ot_hours=float(ot_val))
             
             final_gross = pay_data["gross"]
             final_absent = pay_data["absent"]
@@ -1374,13 +1493,13 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
                 pay_data["reg_pay"], pay_data["ot_pay"], final_gross,
                 final_vat, final_ph, final_sss, final_pag,
-                final_absent, final_net, current_date
+                final_absent, final_net, pay_date.strftime("%B %d, %Y")
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, final_net)
 
             processed_slips.append({
-                "date": current_date, 
+                "date": pay_date.strftime("%B %d, %Y"), 
                 "id": str(emp.id), 
                 "name": emp.name, 
                 "dept": emp.department, 
@@ -1436,7 +1555,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             for widget in right_pane.winfo_children():
                 widget.destroy()
 
-            ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {slip['date']}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
+            ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {datetime.datetime.now().strftime("%B %Y")}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
             
             info_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
             info_frame.pack(fill="x", padx=30, pady=5)
@@ -1455,6 +1574,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             self._create_slip_row(money_frame, "OVERTIME PAYMENTS:", f"Php {slip['ot_pay']:,.2f}")
             self._create_slip_row(money_frame, "GROSS BASE PAY:", f"Php {slip['gross']:,.2f}")
             self._create_slip_row(money_frame, "STATUTORY DEDUCTIONS:", f"Php {(slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip["absent"]):,.2f}")
+            self._create_slip_row(money_frame, "PAYMENT DATE:", f"{slip['date']}")
+
             
             net_box = ctk.CTkFrame(right_pane, fg_color="#90ee90", corner_radius=4)
             net_box.pack(fill="x", padx=30, pady=20, side="bottom")
@@ -1528,15 +1649,18 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
             lbl.pack(side="left", padx=10, pady=8)
 
         all_slips = self.master.file_handler.get_all_salary_slips()
-        search_filter = self.search_entry.get().strip()
+        search_filter = self.search_entry.get().strip().lower()
 
         row_counter = 0
 
         for emp_id, slips in all_slips.items():
-            if search_filter and search_filter not in str(emp_id):
-                continue
-
             for slip in slips:
+                emp_name = slip.get('name', '').lower()
+                str_emp_id = str(emp_id).lower()
+
+                if search_filter and (search_filter not in str_emp_id and search_filter not in emp_name):
+                    continue
+
                 bg_color = "#fdfdfd" if row_counter % 2 == 0 else "#f1f3f5"
                 row_frame = ctk.CTkFrame(self.table_container, fg_color=bg_color, corner_radius=0)
                 row_frame.pack(fill="x", pady=1)
@@ -1554,7 +1678,7 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                 ]
 
                 for text, w in zip(data_fields, widths):
-                    val_lbl = ctk.CTkLabel(row_frame, text=text, width=w, text_color="black", font=("Helvetica", 12), anchor="w")
+                    val_lbl = ctk.CTkLabel(row_frame, text=str(text), width=w, text_color="black", font=("Helvetica", 12), anchor="w")
                     val_lbl.pack(side="left", padx=10, pady=6)
 
                 row_counter += 1
@@ -1566,7 +1690,6 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
 class PayrollSystemApp(ctk.CTk):
     def __init__(self, screenWidth=1280, screenHeight=720):
         super().__init__()
-
         self.payroll_system = PayrollSystemManager()
         self.payroll_queue = PayrollQueue()
         self.sorter = PayrollAlgo()
@@ -1583,7 +1706,6 @@ class PayrollSystemApp(ctk.CTk):
 
         self.auth_user = None
         self.current_frame = None
-        print("Current Frame: ", self.current_frame)
         self.show_admin_page()
 
     def exit(self):
@@ -1594,7 +1716,6 @@ class PayrollSystemApp(ctk.CTk):
     def show_admin_page(self):
         self.current_frame = AdminLoginFrame(self, self.show_home_page)
         self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
-        print("Current Frame: ", self.current_frame)
 
     def show_home_page(self, username):
 
@@ -1607,7 +1728,6 @@ class PayrollSystemApp(ctk.CTk):
         self.current_frame.place_forget()
         self.current_frame = HomePageFrame(self, username=self.auth_user)
         self.current_frame.pack(fill="both", expand=True)
-        print("Current Frame: ", self.current_frame)
 
     def show_view_all_page(self):
         """Hides current frame and shows the Employee List."""

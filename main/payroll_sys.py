@@ -8,7 +8,7 @@ class Employee:
         self.department = department
         self.position = position
         self.hire_date = hire_date
-        self.__salary = 0
+        self._salary = 0.0
         self.email = email
         self.bank_account = bank_account
         self.emp_type = emp_type
@@ -19,14 +19,14 @@ class Employee:
 
     def set_salary(self, amount):
         if amount > 0:
-            self.__salary = amount
+            self._salary = float(amount)
         else:
             pass
 
     def get_salary(self):
-        return self.__salary
+        return self._salary
     
-    def calculate_payroll_breakdown(self, hours_override=None, absences_count=0):
+    def calculate_payroll_breakdown(self, hours_override=None, absences_count=0, ot_hours=0):
         """
         Calculates itemized financial breakdowns. 
         Returns a structured dictionary of figures rounded to 2 decimal places.
@@ -36,12 +36,16 @@ class Employee:
         if self.emp_type == "Full-Time":
             base_salary = self.get_salary()
             reg_pay = base_salary
-            ot_pay = 0.0
+            overtime_hours = ot_hours
+            total_monthly_hours = 22 * 8
+            hourly_rate = reg_pay / total_monthly_hours
+
+            ot_pay = round(overtime_hours * (hourly_rate * 1.5), 2)
 
             daily_rate = base_salary / 22.0
             attendance_deduction = round(num_absences * daily_rate, 2)
         else:
-            # For Part-Time, use hours_override if provided via processing queue
+            #
             hours = float(hours_override) if hours_override is not None else getattr(self, 'hours_worked', 40.0)
             rate = float(getattr(self, 'hourly_rate', 500.0))
             
@@ -51,14 +55,14 @@ class Employee:
             reg_pay = reg_hours * rate
             ot_pay = ot_hours * (rate * 1.5)
 
-            attendance_deduction = round(num_absences * (rate * 8.0), 2)
+            attendance_deduction = round(num_absences * rate, 2)
         gross = reg_pay + ot_pay
 
         # Deductions
-        vat = round(gross * 0.12, 2)
-        ph = round(gross * 0.05, 2)
-        sss = round(gross * 0.04, 2)
-        pag = round(gross * 0.02, 2)
+        vat = round(reg_pay * 0.12, 2)
+        ph = round(reg_pay * 0.025, 2)
+        sss = 1750.00 if gross >= 35000.00 else round(reg_pay * 0.045, 2)
+        pag = 200.00
 
         total_deductions = vat + ph + sss + pag + attendance_deduction
         net = round(gross - total_deductions, 2)
@@ -80,12 +84,9 @@ class PartTimeEmployee(Employee):
         super().__init__(id, name, gender, department, position, hire_date, email, bank_account, "Part-Time")
         self.hours_worked = hours_worked
         self.hourly_rate = hourly_rate 
-
-        self.calculate_salary()
         
-    def calculate_salary(self):
-        total_salary = self.hours_worked * self.hourly_rate
-        self.set_salary(total_salary)
+    def get_salary(self):
+        return round(self.hours_worked * self.hourly_rate, 2)
 
 class FullTimeEmployee(Employee):
     def __init__(self, id, name, gender, department, position, hire_date, monthly_salary, email, bank_account):
@@ -152,7 +153,7 @@ class PayrollSystemManager:
         target_name = str(employee_name).strip()
         for emp in self.employees:
             cur_emp = str(emp.name).strip()
-            if cur_emp in target_name:
+            if target_name in cur_emp:
                 self.employees.remove(employee_name)
                 self._sync()
                 return True, emp.name
@@ -210,7 +211,6 @@ class PayrollSystemManager:
                 emp.hire_date = hire_date
                 emp.hours_worked = float(hours_worked)
                 emp.hourly_rate = float(hourly_rate)
-                emp.calculate_salary()
                 
             self._sync()
             return True
