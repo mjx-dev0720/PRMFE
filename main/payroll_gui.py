@@ -1361,7 +1361,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         container = ctk.CTkFrame(slip_toplevel, fg_color="white")
         container.pack(expand=True, fill="both", padx=40, pady=20)
 
-        ctk.CTkLabel(container, text=f"SALARY SLIP FOR {datetime.datetime.now().strftime('%B %Y').upper()}", 
+        date_slip = datetime.datetime.now().replace(day=1) + datetime.timedelta(days=31) 
+        ctk.CTkLabel(container, text=f"SALARY SLIP FOR {date_slip.strftime('%B %Y').upper()}", 
                     text_color="black", font=("Helvetica", 24, "bold")).pack()
         ctk.CTkFrame(container, height=2, fg_color="black").pack(fill="x", pady=10)
 
@@ -1413,7 +1414,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         pay_period_start = current_date.replace(day=1)
         _, last_day = calendar.monthrange(current_date.year, current_date.month)
         pay_period_end = current_date.replace(day=last_day)
-        pay_date = pay_period_end + datetime.timedelta(days=15)
+        pay_date = pay_period_end + datetime.timedelta(days=1)
         self._create_slip_row(additional_container, "PAYMENT DATE", pay_date.strftime('%b %d, %Y'))
         self._create_slip_row(additional_container, "PAY PERIOD", f"{pay_period_start.strftime('%b %d, %Y')} - {pay_period_end.strftime('%b %d, %Y')}")
         self._create_slip_row(additional_container, "JOIN DATE", f"{emp.hire_date}")
@@ -1461,7 +1462,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         pay_period_start = current_date.replace(day=1)
         _, last_day = calendar.monthrange(current_date.year, current_date.month)
         pay_period_end = current_date.replace(day=last_day)
-        pay_date = pay_period_end + datetime.timedelta(days=15)
+        pay_date = pay_period_end + datetime.timedelta(days=1)
 
         while not queue.is_empty():
             emp = queue.dequeue()
@@ -1554,8 +1555,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             """Clears old content from the right pane and populates the selected employee's itemized card."""
             for widget in right_pane.winfo_children():
                 widget.destroy()
-
-            ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {datetime.datetime.now().strftime("%B %Y")}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
+            date = datetime.datetime.now().replace(day=1) + datetime.timedelta(days=31)
+            ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {date.strftime("%B %Y")}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
             
             info_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
             info_frame.pack(fill="x", padx=30, pady=5)
