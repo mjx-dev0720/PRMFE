@@ -34,28 +34,28 @@ class Employee:
         """
         num_absences = float(absences_count) if absences_count else 0.0
         if self.emp_type == "Full-Time":
-            base_salary = self.get_salary()
+            base_salary = float(self.get_salary())
             reg_pay = base_salary
-            overtime_hours = ot_hours
-            total_monthly_hours = 22 * 8
-            hourly_rate = reg_pay / total_monthly_hours
+            total_monthly_hours = 22.0 * 8.0
+            hourly_rate = base_salary / total_monthly_hours
 
-            ot_pay = round(overtime_hours * (hourly_rate * 1.5), 2)
+            ot_pay = ot_hours * (hourly_rate * 1.5)
 
             daily_rate = base_salary / 22.0
             attendance_deduction = round(num_absences * daily_rate, 2)
         else:
             #
-            hours = float(hours_override) if hours_override is not None else getattr(self, 'hours_worked', 40.0)
-            rate = float(getattr(self, 'hourly_rate', 500.0))
+            hours = float(hours_override) if hours_override is not None else getattr(self, 'hours_worked', 160.0)
+            rate = float(getattr(self, 'hourly_rate', 100.0))
             
-            reg_hours = min(hours, 40.0)
-            ot_hours = max(0.0, hours - 40.0)
+            reg_hours = min(hours, 160.0)
+            ot_hours = max(0.0, hours - 160.0)
             
             reg_pay = reg_hours * rate
             ot_pay = ot_hours * (rate * 1.5)
 
             attendance_deduction = round(num_absences * rate, 2)
+
         gross = reg_pay + ot_pay
 
         # Deductions

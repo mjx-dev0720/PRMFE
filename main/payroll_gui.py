@@ -110,25 +110,13 @@ class HomePageFrame(ctk.CTkFrame):
         self.primary_font = ctk.CTkFont(family="Helvetica", size=18)
 
         ctk.CTkLabel(self, 
-                    bg_color="#12E068", 
+                    bg_color="#000000", 
                     width=1280, 
                     height=50, 
                     text="Payroll Management System for Employees", 
-                    text_color="black", 
+                    text_color="white", 
                     font=("Helvetica", 20, "bold")
                     ).pack(side="top", fill="x")
-        
-        self.logout_btn = ctk.CTkButton(self, 
-                                        text="Logout", 
-                                        width=100, 
-                                        height=30, 
-                                        fg_color="#e74c3c",
-                                        hover_color="#c0392b",
-                                        text_color="white",
-                                        font=("Helvetica", 12, "bold"),
-                                        command=self.master.handle_logout
-                                        )
-        self.logout_btn.place(relx=0.98, rely=0.015, anchor="ne")
         
         ctk.CTkLabel(self, 
                     text=f"Welcome {username}!",
@@ -147,7 +135,7 @@ class HomePageFrame(ctk.CTkFrame):
                                     text_color="black", 
                                     border_width=3, 
                                     border_color="black", 
-                                    hover_color="#12E068", 
+                                    hover_color="#A0A9A4", 
                                     command=self.open_create_employee_win,
                                     font=self.primary_font
                                     )
@@ -167,7 +155,7 @@ class HomePageFrame(ctk.CTkFrame):
                                 text_color="black", 
                                 border_width=3, 
                                 border_color="black", 
-                                hover_color="#12E068",
+                                hover_color="#A0A9A4",
                                 font=self.primary_font,
                                 command=self.open_delete_employee_win
                                 )
@@ -186,7 +174,7 @@ class HomePageFrame(ctk.CTkFrame):
                                     text_color="black", 
                                     border_width=3, 
                                     border_color="black", 
-                                    hover_color="#12E068",
+                                    hover_color="#A0A9A4",
                                     font=self.primary_font,
                                     command=self.open_search_employee_win
                                     )
@@ -205,7 +193,7 @@ class HomePageFrame(ctk.CTkFrame):
                                     text_color="black", 
                                     border_width=3, 
                                     border_color="black", 
-                                    hover_color="#12E068", 
+                                    hover_color="#A0A9A4", 
                                     command=self.open_edit_employee_win,
                                     font=self.primary_font
                                     )
@@ -225,7 +213,7 @@ class HomePageFrame(ctk.CTkFrame):
                                     text_color="black", 
                                     border_width=3, 
                                     border_color="black", 
-                                    hover_color="#12E068",
+                                    hover_color="#A0A9A4",
                                     font=self.primary_font,
                                     command=self.master.show_process_page
                                     )
@@ -235,6 +223,18 @@ class HomePageFrame(ctk.CTkFrame):
                     font=self.primary_font, 
                     text_color="black"
                     ).grid(row=5, column=1, padx=5, pady=5)
+        
+        self.logout_btn = ctk.CTkButton(self, 
+                                        text="Logout", 
+                                        width=100, 
+                                        height=30, 
+                                        fg_color="#fd220a",
+                                        hover_color="#bd1a08",
+                                        text_color="white",
+                                        font=("Helvetica", 12, "bold"),
+                                        command=self.master.handle_logout
+                                        )
+        self.logout_btn.pack(side="right")
 
         view_all_lbl = ctk.CTkLabel(self, 
             text="View All Employees", 
@@ -284,36 +284,17 @@ class HomePageFrame(ctk.CTkFrame):
         } 
 
         self.salary_rates = {
-                # Engineering
-                "Software Engineer": {"Full": 60000, "Part": 600},
-                "Embedded Systems Developer": {"Full": 65000, "Part": 650},
-                "Mobile App Developer": {"Full": 55000, "Part": 550},
-                "DevOps Engineer": {"Full": 70000, "Part": 700},
-                "QA Automation Engineer": {"Full": 50000, "Part": 500},
-    
-                # Data & Security
-                "AI Engineer": {"Full": 85000, "Part": 850},
-                "Data Scientist": {"Full": 80000, "Part": 800},
-                "Cybersecurity Analyst": {"Full": 75000, "Part": 750},
-                "Database Administrator": {"Full": 65000, "Part": 650},
-    
-                # HR
-                "HR Manager": {"Full": 45000, "Part": 450},
-                "Recruiter": {"Full": 35000, "Part": 350},
-                "Training Specialist": {"Full": 40000, "Part": 400},
-                "Compensation Analyst": {"Full": 42000, "Part": 420},
-    
-                # Support & Ops
-                "UI/UX Developer": {"Full": 50000, "Part": 500},
-                "Technical Support Lead": {"Full": 35000, "Part": 350},
-                "Operations Coordinator": {"Full": 38000, "Part": 380},
-                "Project Manager": {"Full": 65000, "Part": 650},
-
-                # Infrastructure
-                "Cloud Architect": {"Full": 95000, "Part": 950},
-                "Network Engineer": {"Full": 55000, "Part": 550},
-                "Systems Administrator": {"Full": 50000, "Part": 500},
-                "IT Helpdesk": {"Full": 25000, "Part": 250}
+                "Software Engineer": {"Full": 55000.00, "Part": 343.75}, "Embedded Systems Developer": {"Full": 65000.00, "Part": 444.50},
+                "Mobile App Developer": {"Full": 55000.00, "Part": 325.75}, "DevOps Engineer": {"Full": 70000.00, "Part": 468.35},
+                "QA Automation Engineer": {"Full": 50000.00, "Part": 312.90}, "AI Engineer": {"Full": 85000.00, "Part": 534.75},
+                "Data Scientist": {"Full": 80000.00, "Part": 515.50}, "Cybersecurity Analyst": {"Full": 75000.00, "Part": 496.90},
+                "Database Administrator": {"Full": 65000.00, "Part": 450.00}, "HR Manager": {"Full": 45000.00, "Part": 300.00},
+                "Recruiter": {"Full": 35000.00, "Part": 241.55}, "Training Specialist": {"Full": 40000.00, "Part": 369.90},
+                "Compensation Analyst": {"Full": 42000.00, "Part": 312.00}, "UI/UX Developer": {"Full": 50000.00, "Part": 320.50},
+                "Technical Support Lead": {"Full": 35000.00, "Part": 243.10}, "Operations Coordinator": {"Full": 38000.00, "Part": 230.50},
+                "Project Manager": {"Full": 65000.00, "Part": 350.98}, "Cloud Architect": {"Full": 95000.00, "Part": 600.00},
+                "Network Engineer": {"Full": 55000.00, "Part": 350.55}, "Systems Administrator": {"Full": 50000.00, "Part": 314.69},
+                "IT Helpdesk": {"Full": 25000.00, "Part": 180.50}
         }
 
         ctk.CTkLabel(self.create_emp, 
@@ -664,7 +645,7 @@ class HomePageFrame(ctk.CTkFrame):
         
         result_frame = ctk.CTkFrame(self.search_win, border_color="black", width=250, height=300)
         result_frame.pack(pady=10)
-        ctk.CTkLabel(result_frame, text="Search Result", bg_color="#c2f0d1", height=40, width=300, 
+        ctk.CTkLabel(result_frame, text="Search Result", bg_color="#A0A9A4", height=40, width=300, 
                     text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=1, pady=(0,20))
         self.search_result = ctk.CTkLabel(result_frame, text="")
         self.search_result.grid(row=1, column=0, columnspan=1, pady=10)
@@ -746,17 +727,17 @@ class HomePageFrame(ctk.CTkFrame):
         }
 
         self.salary_rates = {
-                "Software Engineer": {"Full": 60000, "Part": 600}, "Embedded Systems Developer": {"Full": 65000, "Part": 650},
-                "Mobile App Developer": {"Full": 55000, "Part": 550}, "DevOps Engineer": {"Full": 70000, "Part": 700},
-                "QA Automation Engineer": {"Full": 50000, "Part": 500}, "AI Engineer": {"Full": 85000, "Part": 850},
-                "Data Scientist": {"Full": 80000, "Part": 800}, "Cybersecurity Analyst": {"Full": 75000, "Part": 750},
-                "Database Administrator": {"Full": 65000, "Part": 650}, "HR Manager": {"Full": 45000, "Part": 450},
-                "Recruiter": {"Full": 35000, "Part": 350}, "Training Specialist": {"Full": 40000, "Part": 400},
-                "Compensation Analyst": {"Full": 42000, "Part": 420}, "UI/UX Developer": {"Full": 50000, "Part": 500},
-                "Technical Support Lead": {"Full": 35000, "Part": 350}, "Operations Coordinator": {"Full": 38000, "Part": 380},
-                "Project Manager": {"Full": 65000, "Part": 650}, "Cloud Architect": {"Full": 95000, "Part": 950},
-                "Network Engineer": {"Full": 55000, "Part": 550}, "Systems Administrator": {"Full": 50000, "Part": 500},
-                "IT Helpdesk": {"Full": 25000, "Part": 250}
+                "Software Engineer": {"Full": 55000.00, "Part": 343.75}, "Embedded Systems Developer": {"Full": 65000.00, "Part": 444.50},
+                "Mobile App Developer": {"Full": 55000.00, "Part": 325.75}, "DevOps Engineer": {"Full": 70000.00, "Part": 468.35},
+                "QA Automation Engineer": {"Full": 50000.00, "Part": 312.90}, "AI Engineer": {"Full": 85000.00, "Part": 534.75},
+                "Data Scientist": {"Full": 80000.00, "Part": 515.50}, "Cybersecurity Analyst": {"Full": 75000.00, "Part": 496.90},
+                "Database Administrator": {"Full": 65000.00, "Part": 450.00}, "HR Manager": {"Full": 45000.00, "Part": 300.00},
+                "Recruiter": {"Full": 35000.00, "Part": 241.55}, "Training Specialist": {"Full": 40000.00, "Part": 369.90},
+                "Compensation Analyst": {"Full": 42000.00, "Part": 312.00}, "UI/UX Developer": {"Full": 50000.00, "Part": 320.50},
+                "Technical Support Lead": {"Full": 35000.00, "Part": 243.10}, "Operations Coordinator": {"Full": 38000.00, "Part": 230.50},
+                "Project Manager": {"Full": 65000.00, "Part": 350.98}, "Cloud Architect": {"Full": 95000.00, "Part": 600.00},
+                "Network Engineer": {"Full": 55000.00, "Part": 350.55}, "Systems Administrator": {"Full": 50000.00, "Part": 314.69},
+                "IT Helpdesk": {"Full": 25000.00, "Part": 180.50}
         }
 
         ctk.CTkLabel(self.edit_emp_win, text="Modify Employee Info", text_color="black", font=("Helvetica", 40, "bold")).pack(padx=5, pady=15)
@@ -922,9 +903,9 @@ class ViewEmployeesFrame(ctk.CTkFrame):
                         font=("Helvetica", 11))
         style.configure("Treeview.Heading", 
                         font=("Helvetica", 12, "bold"), 
-                        background="#c2f0d1",
+                        background="#A0A9A4",
                         foreground="black")
-        style.map("Treeview", background=[('selected', '#12E068')])
+        style.map("Treeview", background=[('selected', '#A0A9A4')])
 
         cols = ("ID", "Name", "Gender", "Department", "Position", "Hire Date", "Type", "Salary")
         self.tree = ttk.Treeview(container, columns=cols, show="headings")
@@ -1016,9 +997,9 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.master = master
         self.primary_font = ctk.CTkFont(family="Helvetica", size=16, weight="bold")
         
-        ctk.CTkLabel(self, bg_color="#12E068", width=1280, height=50, 
+        ctk.CTkLabel(self, bg_color="#000000", width=1280, height=50, 
                     text="Payroll Management System for Employees", 
-                    text_color="black", font=("Helvetica", 20, "bold")).pack(side="top", fill="x")
+                    text_color="white", font=("Helvetica", 20, "bold")).pack(side="top", fill="x")
 
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.pack(expand=True, pady=20)
@@ -1028,33 +1009,33 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.left_panel.grid(row=0, column=0, padx=20, sticky="nsew")
         self.left_panel.grid_propagate(False)
 
-        ctk.CTkLabel(self.left_panel, text="EMPLOYEE DETAILS", bg_color="#c2f0d1", height=40, width=500, 
+        ctk.CTkLabel(self.left_panel, text="EMPLOYEE DETAILS", bg_color="#A0A9A4", height=40, width=500, 
                     text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=3, pady=(0, 20))
 
         ctk.CTkLabel(self.left_panel, text="EMPLOYEE ID:", text_color="black", font=self.primary_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        self.search_id_entry = ctk.CTkEntry(self.left_panel, width=200, fg_color="#c2f0d1", border_color="black")
+        self.search_id_entry = ctk.CTkEntry(self.left_panel, width=200, fg_color="#A0A9A4", border_color="black")
         self.search_id_entry.grid(row=1, column=1, padx=5)
-        ctk.CTkButton(self.left_panel, text="SEARCH", width=100, fg_color="yellow", text_color="black", hover_color="#cccc00", 
+        ctk.CTkButton(self.left_panel, text="SEARCH", width=100, fg_color="black", text_color="white", hover_color="#696969", 
                     command=self.handle_search).grid(row=1, column=2, padx=5)
 
         ctk.CTkLabel(self.left_panel, text="EMPLOYEE NAME:", text_color="black", font=self.primary_font).grid(row=2, column=0, padx=10, pady=10, sticky="w")
-        self.name_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.name_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.name_entry.grid(row=2, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
         ctk.CTkLabel(self.left_panel, text="GENDER:", text_color="black", font=self.primary_font).grid(row=3, column=0, padx=10, pady=10, sticky="w")
-        self.gender_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.gender_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.gender_entry.grid(row=3, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
         ctk.CTkLabel(self.left_panel, text="DEPARTMENT:", text_color="black", font=self.primary_font).grid(row=4, column=0, padx=10, pady=10, sticky="w")
-        self.dept_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.dept_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.dept_entry.grid(row=4, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
         ctk.CTkLabel(self.left_panel, text="POSITION:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=10, pady=10, sticky="w")
-        self.pos_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.pos_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.pos_entry.grid(row=5, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
         ctk.CTkLabel(self.left_panel, text="TYPE:", text_color="black", font=self.primary_font).grid(row=6, column=0, padx=10, pady=10, sticky="w")
-        self.emp_type_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.emp_type_entry = ctk.CTkEntry(self.left_panel, width=300, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.emp_type_entry.grid(row=6, column=1, columnspan=2, padx=5, pady=10, sticky="w")
 
         # --- RIGHT PANEL: SALARY DETAILS ---
@@ -1062,11 +1043,11 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.right_panel.grid(row=0, column=1, padx=20, sticky="nsew")
         self.right_panel.grid_propagate(False)
 
-        ctk.CTkLabel(self.right_panel, text="EMPLOYEE SALARY DETAILS", bg_color="#c2f0d1", height=40, width=550, 
+        ctk.CTkLabel(self.right_panel, text="EMPLOYEE SALARY DETAILS", bg_color="#A0A9A4", height=40, width=550, 
                     text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=4, pady=(0, 20))
         
         ctk.CTkLabel(self.right_panel, text="Date", text_color="black", font=self.primary_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        self.date_entry = ctk.CTkEntry(self.right_panel, width=150, fg_color="#c2f0d1", border_color="black", state="readonly")
+        self.date_entry = ctk.CTkEntry(self.right_panel, width=150, fg_color="#A0A9A4", border_color="black", state="readonly")
         self.date_entry.grid(row=1, column=1, padx=0, pady=0, sticky="w")
 
         self.monthly_salary_label = ctk.CTkLabel(self.right_panel, text="Monthly Salary:", font=self.primary_font)
@@ -1091,8 +1072,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.absent_entry = ctk.CTkEntry(self.right_panel, width=150)
         self.absent_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
 
-        self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, width=120, fg_color="#12E068", 
-                                        text_color="black", font=self.primary_font, command=self.compute_payroll)
+        self.compute_btn = ctk.CTkButton(self.right_panel, text="Generate PaySlip", height=45, width=120, fg_color="#000000", 
+                                        text_color="white", font=self.primary_font, command=self.compute_payroll)
         self.compute_btn.grid(row=6, column=0, columnspan=2, pady=30, padx=5, sticky="ew")
 
         self.add_queue_btn = ctk.CTkButton(
@@ -1100,8 +1081,9 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                                         text="Add to Batch Queue", 
                                         command=self.add_to_pay_queue,
                                         font=("Helvetica", 14),
-                                        fg_color="#e67e22", 
-                                        hover_color="#d35400"
+                                        fg_color="#000000", 
+                                        hover_color="#000000",
+                                        text_color="white"
                                     )
         self.add_queue_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
@@ -1109,11 +1091,11 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.queue_status_label.grid(row=7, column=3, columnspan=2, pady=5)
 
         self.bulk_queue_btn = ctk.CTkButton(self.right_panel, text="ENQUEUE ALL EMPLOYEES", height=45, width=120,
-                                            fg_color="#3a7ebf", text_color="white", 
+                                            fg_color="#000000", text_color="white", 
                                             command=self.bulk_enqueue_all)
         self.bulk_queue_btn.grid(row=8, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
-        ctk.CTkButton(self.right_panel, text="Get All Slip", command=self.process_and_display_all_queued).grid(row=8, column=3, pady=10, padx=10, sticky="ew")
+        ctk.CTkButton(self.right_panel, fg_color="#020403", text_color="white", text="Get All Slip", command=self.process_and_display_all_queued).grid(row=8, column=3, pady=10, padx=10, sticky="ew")
 
         ctk.CTkButton(self, text="BACK", fg_color="red", width=100, height=40, font=self.primary_font,
                     command=lambda: self.master.show_home_page(self.master.auth_user)).pack(pady=10)
@@ -1307,7 +1289,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                         messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
                         return
                 else:
-                    hours_val = getattr(emp, 'hours_worked', 40.0)
+                    hours_val = getattr(emp, 'hours_worked', 160.0)
 
             if emp.emp_type == "Full-Time":
                 if hasattr(self, 'ot_hours_entry') and self.ot_hours_entry.get().strip():
@@ -1354,9 +1336,9 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.configure(fg_color="white")
         current_date = datetime.datetime.now()
         
-        banner = ctk.CTkFrame(slip_toplevel, fg_color="#c2f0d1", corner_radius=0, height=40)
+        banner = ctk.CTkFrame(slip_toplevel, fg_color="#000000", corner_radius=0, height=40)
         banner.pack(fill="x", side="top")
-        ctk.CTkLabel(banner, text="Payroll Management System for Employees", text_color="black").pack(pady=5)
+        ctk.CTkLabel(banner, text="Payroll Management System for Employees", text_color="white").pack(pady=5)
 
         container = ctk.CTkFrame(slip_toplevel, fg_color="white")
         container.pack(expand=True, fill="both", padx=40, pady=20)
@@ -1424,7 +1406,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         footer_spacer = ctk.CTkFrame(container, fg_color="transparent", height=40)
         footer_spacer.pack(fill="x")
 
-        net_box = ctk.CTkFrame(container, fg_color="#90ee90", border_color="black", border_width=2, corner_radius=0)
+        net_box = ctk.CTkFrame(container, fg_color="#A0A9A4", border_color="black", border_width=2, corner_radius=0)
         net_box.pack(side="right", pady=(20, 10))
         
         ctk.CTkLabel(net_box, text="NET SALARY RECEIVED", text_color="black", 
@@ -1472,7 +1454,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             ot_val = getattr(emp, 'staged_ot_hours', 0.0)
             hours_val = getattr(emp, 'staged_hours', 0.0)
             if hours_val == 0.0:
-                hours_val = getattr(emp, 'hours_worked', 40.0)
+                hours_val = getattr(emp, 'hours_worked', 160.0)
             
             if emp.emp_type == "Full-Time":
                 hours_override_param = float(days_val)
@@ -1534,7 +1516,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         summary_win.configure(fg_color="#f5f5f5")
         summary_win.attributes("-topmost", True)
 
-        banner = ctk.CTkFrame(summary_win, fg_color="#c2f0d1", corner_radius=0, height=50)
+        banner = ctk.CTkFrame(summary_win, fg_color="#A0A9A4", corner_radius=0, height=50)
         banner.pack(fill="x", side="top")
         ctk.CTkLabel(banner, text=f"Batch Run Complete: Processed {len(slips_list)} Slips Successfully", 
                     text_color="black", font=("Helvetica", 16, "bold")).pack(pady=10)
@@ -1578,7 +1560,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             self._create_slip_row(money_frame, "PAYMENT DATE:", f"{slip['date']}")
 
             
-            net_box = ctk.CTkFrame(right_pane, fg_color="#90ee90", corner_radius=4)
+            net_box = ctk.CTkFrame(right_pane, fg_color="#A0A9A4", corner_radius=4)
             net_box.pack(fill="x", padx=30, pady=20, side="bottom")
             ctk.CTkLabel(net_box, text=f"NET SALARY RECEIVED: Php {slip['net']:,.2f}", 
                         text_color="black", font=("Helvetica", 16, "bold")).pack(pady=12)
@@ -1609,7 +1591,7 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         self.master = master
         self.on_back = on_back
 
-        banner = ctk.CTkFrame(self, fg_color="#c2f0d1", height=60, corner_radius=0)
+        banner = ctk.CTkFrame(self, fg_color="#A0A9A4", height=60, corner_radius=0)
         banner.pack(fill="x", side="top")
         
         ctk.CTkLabel(banner, text="HISTORICAL SALARY TRANSACTION LEDGER", 
