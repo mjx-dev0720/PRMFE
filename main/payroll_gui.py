@@ -4,6 +4,8 @@ from payroll_sys import *
 from db_handling import PayrollDataFileHandling
 import datetime
 import calendar
+import random
+import string
 from dsa_algo import *
 
 #Admin Login Frame
@@ -493,7 +495,7 @@ class HomePageFrame(ctk.CTkFrame):
             dep = self.department_dropdown.get()
             pos = self.position_dropdown.get()
             emp_type = self.emp_dropdown.get()
-            hire_date = datetime.datetime.now().strftime("%B %d, %Y")
+            hire_date = self.master.current_system_time.strftime("%B %d, %Y")
             email = self.email_entry.get()
             bank_account = self.bank_entry.get()
             salary_val = float(self.salary_entry.get().replace("₱", ""))
@@ -1047,7 +1049,9 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                     text_color="black", font=self.primary_font).grid(row=0, column=0, columnspan=4, pady=(0, 20))
         
         ctk.CTkLabel(self.right_panel, text="Date", text_color="black", font=self.primary_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        self.date_entry = ctk.CTkEntry(self.right_panel, width=150, fg_color="#A0A9A4", border_color="black", state="readonly")
+        self.date_entry = ctk.CTkEntry(self.right_panel, width=150, fg_color="#A0A9A4", border_color="black", state="normal")
+        self.date_entry.insert("end", self.master.current_system_time.strftime("%B %d, %Y"))
+        self.date_entry.configure(state="readonly")
         self.date_entry.grid(row=1, column=1, padx=0, pady=0, sticky="w")
 
         self.monthly_salary_label = ctk.CTkLabel(self.right_panel, text="Monthly Salary:", font=self.primary_font)
@@ -1119,14 +1123,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
         messagebox.showinfo("Success", f"Successfully loaded {counter} employees into the Pay-Run sequence!")
 
-    def set_current_datetime(self):
-        now = datetime.datetime.now().strftime("%B %d, %Y")
-        
-        self.date_entry.configure(state="normal")
-        self.date_entry.delete(0, "end")
-        self.date_entry.insert(0, now)
-        self.date_entry.configure(state="readonly")
-
     def handle_search(self):
         """Logic to search for employee by ID and fill the fields."""
         query = self.search_id_entry.get().strip()
@@ -1146,8 +1142,6 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 entry.delete(0, "end")
                 entry.insert(0, value)
                 entry.configure(state="readonly")
-
-            self.set_current_datetime()
 
             if emp.emp_type == "Full-Time":
                 self.rate_label.grid_remove()
@@ -1272,14 +1266,31 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
                 return
 
+            # --- DYNAMIC CALENDAR PERIOD STRINGS GENERATION ---
+            current_date = self.master.current_system_time
+            pay_period_start = current_date.replace(day=1)
+            _, last_day = calendar.monthrange(current_date.year, current_date.month)
+            pay_period_end = current_date.replace(day=last_day)
+            
+            # Matches your exact required database layout: e.g., "May 01-31 2026"
+            formatted_period_date = f"{pay_period_start.strftime('%B %d-')}{pay_period_end.strftime('%d %Y')}"
+
+            # --- MONTHLY DUPLICATE GUARD INTERCEPTION LOCK ---
+            if self.master.file_handler.is_period_already_processed(emp.id, formatted_period_date):
+                messagebox.showerror(
+                    "Payroll Cycle Lock",
+                    f"Processing Denied!\n\nAn official salary slip has already been recorded for "
+                    f"{emp.name} (ID: {emp.id}) covering the cycle period:\n[{formatted_period_date}].\n\n"
+                    f"System restricts calculation actions to once per monthly range cycle."
+                )
+                return
+
             if hasattr(self, 'absent_entry') and self.absent_entry.get().strip():
                 try:
                     absences_input = float(self.absent_entry.get().strip())
                 except ValueError:
                     messagebox.showerror("Typing Error", "Absences field must contain a valid number.")
                     return
-
-            current_date = datetime.datetime.now().strftime("%B %d, %Y")
 
             if emp.emp_type == "Part-Time":
                 if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
@@ -1308,7 +1319,8 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
             pay_data["reg_pay"], pay_data["ot_pay"], pay_data["gross"],
             pay_data["vat"], pay_data["ph"], pay_data["sss"], pay_data["pag"],
-            pay_data["absent"], pay_data["net"], current_date
+            pay_data["absent"], pay_data["net"], f"{pay_period_start.strftime("%B %d-")}{pay_period_end.strftime("%d %Y")}",
+            self.generate_transaction_id()
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, pay_data["net"])
@@ -1326,6 +1338,13 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
         except ValueError:
             messagebox.showerror("Error", "Please ensure all numeric fields are filled correctly.")
+    
+    def generate_transaction_id(self):
+        """Generates a highly unique reference format: TXN-YYYYMM-5RandomChars"""
+        current_date = datetime.datetime.now().strftime("%Y%m")
+        # Generates a random 5-character string containing uppercase letters and digits
+        random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        return f"TXN-{current_date}-{random_suffix}"
 
     def display_payslip(self, emp, pay_data, date_string):
         slip_toplevel = ctk.CTkToplevel(self.master)
@@ -1334,7 +1353,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.geometry("900x750")
         slip_toplevel.resizable(False, False)
         slip_toplevel.configure(fg_color="white")
-        current_date = datetime.datetime.now()
+        current_date = self.master.current_system_time
         
         banner = ctk.CTkFrame(slip_toplevel, fg_color="#000000", corner_radius=0, height=40)
         banner.pack(fill="x", side="top")
@@ -1343,7 +1362,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         container = ctk.CTkFrame(slip_toplevel, fg_color="white")
         container.pack(expand=True, fill="both", padx=40, pady=20)
 
-        date_slip = datetime.datetime.now().replace(day=1) + datetime.timedelta(days=31) 
+        date_slip = current_date.replace(day=1) + datetime.timedelta(days=31) 
         ctk.CTkLabel(container, text=f"SALARY SLIP FOR {date_slip.strftime('%B %Y').upper()}", 
                     text_color="black", font=("Helvetica", 24, "bold")).pack()
         ctk.CTkFrame(container, height=2, fg_color="black").pack(fill="x", pady=10)
@@ -1439,15 +1458,23 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             return
 
         processed_slips = []
-        current_date = datetime.datetime.now()
 
+        # --- DYNAMIC CALENDAR PERIOD STRINGS GENERATION ---
+        current_date = self.master.current_system_time
         pay_period_start = current_date.replace(day=1)
         _, last_day = calendar.monthrange(current_date.year, current_date.month)
         pay_period_end = current_date.replace(day=last_day)
-        pay_date = pay_period_end + datetime.timedelta(days=1)
+            
+        # Matches your exact required database layout: e.g., "May 01-31 2026"
+        formatted_period_date = f"{pay_period_start.strftime('%B %d-')}{pay_period_end.strftime('%d %Y')}"
 
         while not queue.is_empty():
             emp = queue.dequeue()
+
+            if self.master.file_handler.is_period_already_processed(emp.id, formatted_period_date):
+                if hasattr(emp, 'staged_absences'):
+                    del emp.staged_absences
+                continue
 
             absences_to_charge = getattr(emp, 'staged_absences', 0.0)
             days_val = getattr(emp, 'staged_days_in_month', 22)
@@ -1476,13 +1503,14 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 str(emp.id), emp.name, emp.department, emp.position, emp.emp_type,
                 pay_data["reg_pay"], pay_data["ot_pay"], final_gross,
                 final_vat, final_ph, final_sss, final_pag,
-                final_absent, final_net, pay_date.strftime("%B %d, %Y")
+                final_absent, final_net, f"{pay_period_start.strftime("%B %d-")}{pay_period_end.strftime("%d %Y")}",
+                self.generate_transaction_id()
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, final_net)
 
             processed_slips.append({
-                "date": pay_date.strftime("%B %d, %Y"), 
+                "date": formatted_period_date, 
                 "id": str(emp.id), 
                 "name": emp.name, 
                 "dept": emp.department, 
@@ -1502,10 +1530,20 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             if hasattr(emp, 'staged_absences'):
                 del emp.staged_absences
 
-        if hasattr(self, 'queue_status_label'):
-            self.queue_status_label.configure(text="Queue: 0 Employees")
+        if len(processed_slips) != 0:
+            self.open_batch_summary_window(processed_slips)
 
-        self.open_batch_summary_window(processed_slips)
+            if hasattr(self, 'queue_status_label'):
+                self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
+        else:
+            messagebox.showerror(
+                    "Payroll Cycle Lock",
+                    f"Processing Denied!\n\nAn official salary slip has already been recorded for everyone\n"
+                    f"For this month {formatted_period_date}\n"
+                    f"System restricts calculation actions to once per monthly range cycle."
+                )
+            if hasattr(self, 'queue_status_label'):
+                self.queue_status_label.configure(text=f"Queue: {queue.get_size()} Employees")
 
     def open_batch_summary_window(self, slips_list):
         """Displays a clean window allowing users to select and inspect slips from the batch run."""
@@ -1515,6 +1553,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         summary_win.resizable(False, False)
         summary_win.configure(fg_color="#f5f5f5")
         summary_win.attributes("-topmost", True)
+        current_date = self.master.current_system_time
 
         banner = ctk.CTkFrame(summary_win, fg_color="#A0A9A4", corner_radius=0, height=50)
         banner.pack(fill="x", side="top")
@@ -1537,7 +1576,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             """Clears old content from the right pane and populates the selected employee's itemized card."""
             for widget in right_pane.winfo_children():
                 widget.destroy()
-            date = datetime.datetime.now().replace(day=1) + datetime.timedelta(days=31)
+            date = current_date.replace(day=1) + datetime.timedelta(days=31)
             ctk.CTkLabel(right_pane, text=f"OFFICIAL SALARY SLIP - {date.strftime("%B %Y")}", font=("Helvetica", 18, "bold"), text_color="black").pack(pady=15)
             
             info_frame = ctk.CTkFrame(right_pane, fg_color="transparent")
@@ -1594,7 +1633,7 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         banner = ctk.CTkFrame(self, fg_color="#A0A9A4", height=60, corner_radius=0)
         banner.pack(fill="x", side="top")
         
-        ctk.CTkLabel(banner, text="HISTORICAL SALARY TRANSACTION LEDGER", 
+        ctk.CTkLabel(banner, text="SALARY TRANSACTION LEDGER", 
                     text_color="black", font=("Helvetica", 20, "bold")).pack(side="left", padx=20, pady=15)
         
         ctk.CTkButton(banner, text="Back to Dashboard", fg_color="#333333", hover_color="#555555",
@@ -1603,14 +1642,14 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         control_panel = ctk.CTkFrame(self, fg_color="white", height=60, corner_radius=4)
         control_panel.pack(fill="x", padx=20, pady=(15, 0))
         
-        ctk.CTkLabel(control_panel, text="Search Employee ID:", text_color="black", 
+        ctk.CTkLabel(control_panel, text="Search Employee ID or Name:", text_color="black", 
                     font=("Helvetica", 13, "bold")).pack(side="left", padx=(15, 5), pady=15)
         
         self.search_entry = ctk.CTkEntry(control_panel, placeholder_text="e.g., 1001", width=150, text_color="black")
         self.search_entry.pack(side="left", padx=5, pady=15)
         self.search_entry.bind("<KeyRelease>", lambda e: self.load_records_table())
 
-        self.table_container = ctk.CTkScrollableFrame(self, fg_color="white", label_text="Issued Payslip Ledger Matrix")
+        self.table_container = ctk.CTkScrollableFrame(self, fg_color="white", label_text="Payslip Records")
         self.table_container.configure(label_text_color="black", label_font=("Helvetica", 14, "bold"))
         self.table_container.pack(fill="both", expand=True, padx=20, pady=15)
 
@@ -1621,17 +1660,20 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         for widget in self.table_container.winfo_children():
             widget.destroy()
 
-        headers = ["Date", "ID", "Name", "Department", "Gross Pay", "Deductions", "Net Salary"]
-        widths = [120, 80, 180, 150, 120, 120, 120]
+        # Added "Actions" layout header column reference
+        headers = ["Ref No.", "Date", "Employee ID", "Name", "Department", "Gross Pay", "Deductions", "Net Salary", "Actions"]
+        widths = [110, 100, 80, 160, 130, 110, 110, 110, 90]
 
         header_row = ctk.CTkFrame(self.table_container, fg_color="#e0e0e0", corner_radius=0)
         header_row.pack(fill="x", pady=(0, 5))
 
-        for col_idx, (text, w) in enumerate(zip(headers, widths)):
-            lbl = ctk.CTkLabel(header_row, text=text, width=w, font=("Helvetica", 12, "bold"), text_color="black", anchor="w")
+        for text, w in zip(headers, widths):
+            anchor_val = "center" if text == "Actions" else "w"
+            lbl = ctk.CTkLabel(header_row, text=text, width=w, font=("Helvetica", 12, "bold"), text_color="black", anchor=anchor_val)
             lbl.pack(side="left", padx=10, pady=8)
 
         all_slips = self.master.file_handler.get_all_salary_slips()
+        manager = self.master.payroll_system
         search_filter = self.search_entry.get().strip().lower()
 
         row_counter = 0
@@ -1651,6 +1693,7 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                 total_deductions = slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip['absent']
 
                 data_fields = [
+                    slip.get('ref_no', "N/A"),
                     slip['date'],
                     emp_id,
                     slip['name'],
@@ -1660,15 +1703,164 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                     f"Php {slip['net']:,.2f}"
                 ]
 
-                for text, w in zip(data_fields, widths):
+                # Populate raw values tracking slice limits up to the actions margin boundary
+                for text, w in zip(data_fields, widths[:-1]):
                     val_lbl = ctk.CTkLabel(row_frame, text=str(text), width=w, text_color="black", font=("Helvetica", 12), anchor="w")
                     val_lbl.pack(side="left", padx=10, pady=6)
+
+                # Standard Python dictionary profile reconstruction wrapper
+
+                # 2. Build the template dictionary map mapping class object fields safely
+                if hasattr(manager, 'search_employee_by_id'):
+                    live_emp = manager.search_employee_by_id(emp_id)
+                mock_emp_dict = {
+                    'id': emp_id,
+                    'name': slip['name'],
+                    'department': slip['dept'],
+                    
+                    # Pull values dynamically from the Object properties, falling back to history slip log defaults if not found
+                    'position': getattr(live_emp, 'position', slip.get('pos', 'Staff')),
+                    'emp_type': getattr(live_emp, 'emp_type', slip.get('emp_type', 'Full-Time')),
+                    'hourly_rate': getattr(live_emp, 'hourly_rate', slip.get('hourly_rate', 0.0)),
+                    'hours_worked': slip.get('hours_worked', 0.0),
+                    
+                    # --- FIXED: Access the raw object attribute data properties natively ---
+                    'hire_date': getattr(live_emp, 'hire_date', 'N/A'),
+                    'bank_account': getattr(live_emp, 'bank_account', 'N/A')
+                }
+                # Interactive Action button mapped seamlessly to pure Python dictionaries via keyword lambda capturing
+                action_btn = ctk.CTkButton(
+                    row_frame, 
+                    text="View Slip", 
+                    width=widths[-1], 
+                    height=24,
+                    font=("Helvetica", 11, "bold"),
+                    fg_color="#333333",
+                    hover_color="#555555",
+                    command=lambda e=mock_emp_dict, s=slip, d=slip['date']: PayslipModal(self.master, e, s, d)
+                )
+                action_btn.pack(side="left", padx=10, pady=4)
 
                 row_counter += 1
 
         if row_counter == 0:
             ctk.CTkLabel(self.table_container, text="No payroll transactions found matching criteria.", 
                         text_color="gray", font=("Helvetica", 13, "italic")).pack(pady=30)
+            
+class PayslipModal(ctk.CTkToplevel):
+    def __init__(self, master, emp, pay_data, date_string, **kwargs):
+        super().__init__(master, **kwargs)
+        
+        # --- EXACT COPIED METHOD WINDOW INITIALIZATION ---
+        self.title(f"Official Salary Slip for {emp['name']}")
+        self.geometry("900x750")
+        self.resizable(False, False)
+        self.configure(fg_color="white")
+        
+        # Lock user interaction exclusively to this modal layer
+        self.attributes("-topmost", True)
+        self.focus_force()
+        current_date = self.master.current_system_time
+        
+        # --- BANNER ---
+        banner = ctk.CTkFrame(self, fg_color="#000000", corner_radius=0, height=40)
+        banner.pack(fill="x", side="top")
+        ctk.CTkLabel(banner, text="Payroll Management System for Employees", text_color="white").pack(pady=5)
+
+        # --- CONTAINER ---
+        container = ctk.CTkFrame(self, fg_color="white")
+        container.pack(expand=True, fill="both", padx=40, pady=20)
+
+        # Title Header bound to historical context month
+        ctk.CTkLabel(container, text=f"SALARY SLIP FOR {current_date.strftime('%B %Y').upper()}", 
+                    text_color="black", font=("Helvetica", 24, "bold")).pack()
+        ctk.CTkFrame(container, height=2, fg_color="black").pack(fill="x", pady=10)
+
+        # --- SECTION 1: TOP GRID (INFO & EARNINGS) ---
+        top_grid = ctk.CTkFrame(container, fg_color="transparent")
+        top_grid.pack(fill="x", pady=10)
+
+        # Left: Info
+        left_box = ctk.CTkFrame(top_grid, fg_color="transparent")
+        left_box.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
+        ctk.CTkLabel(left_box, text="EMPLOYEE INFORMATION", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        self._create_slip_row(left_box, "EMPLOYEE NAME", emp['name'])
+        self._create_slip_row(left_box, "EMPLOYEE ID", emp['id'])
+        self._create_slip_row(left_box, "WORK POSITION", emp['position'])
+        self._create_slip_row(left_box, "DEPARTMENT", emp['department'])
+
+        # Right: Earnings
+        right_box = ctk.CTkFrame(top_grid, fg_color="transparent")
+        right_box.pack(side="right", anchor="n", expand=True, fill="x")
+        ctk.CTkLabel(right_box, text="SALARY DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        if emp['emp_type'] == "Part-Time":
+            self._create_slip_row(right_box, "HOURLY RATE", f"Php {emp['hourly_rate']:,.2f}")
+            self._create_slip_row(right_box, "HOURS WORKED", f"{emp['hours_worked']:.0f} hrs")
+        self._create_slip_row(right_box, "REGULAR PAY", f"Php {pay_data.get('reg_pay', 0.0):,.2f}")
+        self._create_slip_row(right_box, "OVERTIME", f"Php {pay_data.get('ot_pay', 0.0):,.2f}")
+        self._create_slip_row(right_box, "GROSS SALARY", f"Php {pay_data['gross']:,.2f}")
+
+        # --- SECTION 2: MID GRID (DEDUCTIONS & ADDITIONAL) ---
+        mid_grid = ctk.CTkFrame(container, fg_color="transparent")
+        mid_grid.pack(fill="x", pady=20)
+
+        # Left Bottom: Deductions
+        deduct_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
+        deduct_container.pack(side="left", anchor="n", expand=True, fill="x", padx=(0, 20))
+        ctk.CTkLabel(deduct_container, text="DEDUCTIONS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        self._create_slip_row(deduct_container, "WITHHOLDING TAX", f"Php {pay_data['vat']:,.2f}")
+        self._create_slip_row(deduct_container, "PHILHEALTH", f"Php {pay_data['ph']:,.2f}")
+        self._create_slip_row(deduct_container, "SSS", f"Php {pay_data['sss']:,.2f}")
+        self._create_slip_row(deduct_container, "PAG-IBIG", f"Php {pay_data['pag']:,.2f}")
+        self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {pay_data['absent']:,.2f}")
+        total_ded = pay_data['vat'] + pay_data['ph'] + pay_data['sss'] + pay_data['pag'] + pay_data['absent']
+        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {total_ded:,.2f}")
+
+        # Right Bottom: Additional Details
+        additional_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
+        additional_container.pack(side="right", anchor="n", expand=True, fill="x")
+        ctk.CTkLabel(additional_container, text="ADDITIONAL DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
+        
+        parts = date_string.strip().split(" ") # ["May", "01-31", "2026"]
+        month_name = parts[0]
+        day_range = parts[1]               # "01-31"
+        year_string = parts[2]
+            
+        header_month_year = f"{month_name} {year_string}".upper()
+            
+        # The payment date is supposed to be the 1st of the next month.
+        # We can create a datetime object from the historical string to parse it cleanly
+        historical_dt = datetime.datetime.strptime(f"{month_name} 1 {year_string}", "%B %d %Y")
+        _, last_day = calendar.monthrange(historical_dt.year, historical_dt.month)
+        pay_period_end = historical_dt.replace(day=last_day)
+        pay_date = pay_period_end + datetime.timedelta(days=1)
+            
+        formatted_pay_date = pay_date.strftime('%b %d, %Y')
+        formatted_pay_period = f"{historical_dt.strftime('%b 01, %Y')} - {pay_period_end.strftime('%b %d, %Y')}"
+        
+        self._create_slip_row(additional_container, "PAYMENT DATE", formatted_pay_date)
+        self._create_slip_row(additional_container, "PAY PERIOD", formatted_pay_period)
+        self._create_slip_row(additional_container, "JOIN DATE", f"{emp["hire_date"]}")
+        self._create_slip_row(additional_container, "BANK ACCOUNT", f"{emp["bank_account"]}")
+
+        footer_spacer = ctk.CTkFrame(container, fg_color="transparent", height=40)
+        footer_spacer.pack(fill="x")
+
+        net_box = ctk.CTkFrame(container, fg_color="#A0A9A4", border_color="black", border_width=2, corner_radius=0)
+        net_box.pack(side="right", pady=(20, 10))
+        
+        ctk.CTkLabel(net_box, text="NET SALARY RECEIVED", text_color="black", 
+                    font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
+        ctk.CTkLabel(net_box, text=f"Php {pay_data['net']:,.2f}", text_color="black", 
+                    font=("Helvetica", 18, "bold"), padx=30).pack(side="left", pady=15)
+
+    def _create_slip_row(self, container, label_text, value_text):
+        row = ctk.CTkFrame(container, fg_color="white", border_color="black", border_width=1, corner_radius=0)
+        row.pack(fill="x")
+        ctk.CTkLabel(row, text=label_text, text_color="black", font=("Helvetica", 11), 
+                    width=140, anchor="w", padx=10).pack(side="left", pady=2)
+        ctk.CTkLabel(row, text=value_text, text_color="black", font=("Helvetica", 11, "bold"), 
+                    anchor="e", padx=10).pack(side="right", fill="x", expand=True, pady=2)
         
 class PayrollSystemApp(ctk.CTk):
     def __init__(self, screenWidth=1280, screenHeight=720):
@@ -1678,6 +1870,7 @@ class PayrollSystemApp(ctk.CTk):
         self.sorter = PayrollAlgo()
         self.salary_records = SalaryRecord()
         self.file_handler = PayrollDataFileHandling()
+        self.current_system_time = datetime.datetime.now()
 
         ctk.set_appearance_mode("light")
 

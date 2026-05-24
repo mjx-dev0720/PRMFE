@@ -82,7 +82,7 @@ class PayrollDataFileHandling:
         self.save_config()
         return new_id
         
-    def save_salary_slip_record(self, emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, vat, ph, sss, pag, absent, net, date):
+    def save_salary_slip_record(self, emp_id, name, dept, pos, emp_type, reg_pay, ot_pay, gross, vat, ph, sss, pag, absent, net, date, ref_no):
         """
         Saves a highly explicit, breakdown itemized payroll slip snapshot into the ledger file.
         This guarantees data consistency even if rates change in the future.
@@ -91,7 +91,7 @@ class PayrollDataFileHandling:
             line = (
                 f"{date}|{emp_id}|{name}|{dept}|{pos}|{emp_type}|"
                 f"{reg_pay:.2f}|{ot_pay:.2f}|{gross:.2f}|"
-                f"{vat:.2f}|{ph:.2f}|{sss:.2f}|{pag:.2f}|{absent:.2f}|{net:.2f}\n"
+                f"{vat:.2f}|{ph:.2f}|{sss:.2f}|{pag:.2f}|{absent:.2f}|{net:.2f}|{ref_no}\n"
             )
             with open(self.history_filename, "a", encoding="utf-8") as f:
                 f.write(line)
@@ -114,7 +114,7 @@ class PayrollDataFileHandling:
                     if not line.strip():
                         continue
                     tokens = line.strip().split("|")
-                    if len(tokens) >= 15:
+                    if len(tokens) >= 16:
                         emp_id = tokens[1]
                         if emp_id not in slips_collection:
                             slips_collection[emp_id] = []
@@ -133,9 +133,38 @@ class PayrollDataFileHandling:
                             "sss": float(tokens[11]),
                             "pag": float(tokens[12]),
                             "absent": float(tokens[13]),
-                            "net": float(tokens[14])
+                            "net": float(tokens[14]),
+                            "ref_no": tokens[15]
                         })
             return slips_collection
         except Exception as e:
             print(f"[Database Error] Failed to compile historical salary slips tracking array: {e}")
             return slips_collection
+        
+    def is_period_already_processed(self, emp_id, target_period_str):
+        """
+        Checks if a duplicate record exists based on Employee ID and the exact 
+        pay period string formatted as 'Month DD-DD YYYY' in history.txt.
+        
+        target_period_str expects format like: "May 01-31 2026"
+        """
+        if not os.path.exists(self.history_filename):
+            return False
+
+        try:
+            with open(self.history_filename, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    tokens = line.strip().split("|")
+                    if len(tokens) >= 15:
+                        line_period = tokens[0].strip()
+                        line_emp_id = tokens[1].strip()
+
+                        # Secure matching against the customized monthly string format
+                        if line_emp_id == str(emp_id).strip() and line_period == str(target_period_str).strip():
+                            return True
+            return False
+        except Exception as e:
+            print(f"[Database Error] Error checking custom pay period restrictions: {e}")
+            return False
