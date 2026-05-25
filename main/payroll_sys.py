@@ -44,12 +44,14 @@ class Employee:
             daily_rate = base_salary / 22.0
             attendance_deduction = round(num_absences * daily_rate, 2)
         else:
-            #
-            hours = float(hours_override) if hours_override is not None else getattr(self, 'hours_worked', 160.0)
+            if hours_override is not None:
+                hours_worked = float(hours_override)
+            else:
+                hours_worked = 160.0
             rate = float(getattr(self, 'hourly_rate', 100.0))
             
-            reg_hours = min(hours, 160.0)
-            ot_hours = max(0.0, hours - 160.0)
+            reg_hours = min(hours_worked, 160.0)
+            ot_hours = max(0.0, hours_worked - 160.0)
             
             reg_pay = reg_hours * rate
             ot_pay = ot_hours * (rate * 1.5)
@@ -215,3 +217,15 @@ class PayrollSystemManager:
             self._sync()
             return True
         return False
+    
+    def undo_employee_payroll(self, ref_no):
+        """Undo a pay record"""
+        success, message, emp_id = self.db.undo_payroll_by_ref_no(ref_no)
+        
+        if success and emp_id:
+            emp = self.search_employee_by_id(emp_id)
+            if emp and emp.emp_type == "Part-Time":
+                emp.hours_worked = 160.0
+                self._sync()
+                
+        return success, message

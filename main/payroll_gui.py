@@ -8,7 +8,6 @@ import random
 import string
 from dsa_algo import *
 
-#Admin Login Frame
 class AdminLoginFrame(ctk.CTkFrame):
     def __init__(self, master, on_login_success,  width=800, height=500, fg_color="#e0e0e0", border_color="black", border_width=1, corner_radius=0):
         super().__init__(master, width=width, height=height, fg_color=fg_color, 
@@ -88,12 +87,14 @@ class AdminLoginFrame(ctk.CTkFrame):
         self.login_button.place(relx=0.56, rely=0.75, anchor="center")
 
     def toggle_show_password(self):
+        """Handles show password logic"""
         if self.show_pass_var.get() == "on":
             self.password_entry.configure(show="")
         else:
             self.password_entry.configure(show="*")
 
     def login_action(self):
+        """Handles Login"""
         username = self.username_entry.get()
         password = self.password_entry.get()
 
@@ -104,7 +105,6 @@ class AdminLoginFrame(ctk.CTkFrame):
         else:
             messagebox.showerror("Error", "Invalid Credentials")
 
-#Home Page Frame
 class HomePageFrame(ctk.CTkFrame):
     def __init__(self, master, username="admin"):
         super().__init__(master, fg_color="white")
@@ -255,8 +255,8 @@ class HomePageFrame(ctk.CTkFrame):
         view_records_lbl.pack(side="right", padx=20)
         view_records_lbl.bind("<Button-1>", lambda e: self.master.show_salary_records_page())
     
-    #Open Create Employee Window
     def open_create_employee_win(self):
+        """Open Create Window"""
         self.create_emp = ctk.CTkToplevel(self.winfo_toplevel())
         self.create_emp.title("Creating Employee")
         self.create_emp.geometry("500x700")
@@ -267,36 +267,56 @@ class HomePageFrame(ctk.CTkFrame):
         self.create_emp.protocol("WM_DELETE_WINDOW", self.event_exit_win)
 
         self.dept_pos_map = {
-                "Human Resources": [
-                    "HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst"
-                ],
-                "Engineering & Development": [
-                    "Software Engineer", "Embedded Systems Developer", "Mobile App Developer", 
-                    "DevOps Engineer", "QA Automation Engineer"
-                ],
-                "Data & Security": [
-                    "AI Engineer", "Data Scientist", "Cybersecurity Analyst", "Database Administrator"
-                ],
-                "Support & Operations": [
-                    "UI/UX Developer", "Technical Support Lead", "Operations Coordinator", "Project Manager"
-                ],
-                "IT Infrastructure & Cloud": [
-                    "Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk"
-                ]
-        } 
+                "Human Resources": ["HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst", "HR Generalist"],
+                "Engineering & Development": ["Junior Software Engineer", "Mid-Level Software Engineer", "Senior Software Engineer", "Embedded Systems Developer", "Mobile App Developer", "DevOps Engineer", "QA Automation Engineer", "Frontend Developer", "Backend Developer"],
+                "Data Science & Analytics": ["AI Engineer", "Data Scientist", "Data Analyst", "Data Engineer"],
+                "Cybersecurity & Governance": ["Cybersecurity Analyst", "Information Security Manager", "Penetration Tester"],
+                "Product & Design": ["UI/UX Designer", "Product Owner", "Business Analyst"],
+                "Support & Operations": ["Technical Support Lead", "Operations Coordinator", "Project Manager", "Scrum Master"],
+                "IT Infrastructure & Cloud": ["Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk", "Systems Engineer"]
+        }
 
         self.salary_rates = {
-                "Software Engineer": {"Full": 55000.00, "Part": 343.75}, "Embedded Systems Developer": {"Full": 65000.00, "Part": 444.50},
-                "Mobile App Developer": {"Full": 55000.00, "Part": 325.75}, "DevOps Engineer": {"Full": 70000.00, "Part": 468.35},
-                "QA Automation Engineer": {"Full": 50000.00, "Part": 312.90}, "AI Engineer": {"Full": 85000.00, "Part": 534.75},
-                "Data Scientist": {"Full": 80000.00, "Part": 515.50}, "Cybersecurity Analyst": {"Full": 75000.00, "Part": 496.90},
-                "Database Administrator": {"Full": 65000.00, "Part": 450.00}, "HR Manager": {"Full": 45000.00, "Part": 300.00},
-                "Recruiter": {"Full": 35000.00, "Part": 241.55}, "Training Specialist": {"Full": 40000.00, "Part": 369.90},
-                "Compensation Analyst": {"Full": 42000.00, "Part": 312.00}, "UI/UX Developer": {"Full": 50000.00, "Part": 320.50},
-                "Technical Support Lead": {"Full": 35000.00, "Part": 243.10}, "Operations Coordinator": {"Full": 38000.00, "Part": 230.50},
-                "Project Manager": {"Full": 65000.00, "Part": 350.98}, "Cloud Architect": {"Full": 95000.00, "Part": 600.00},
-                "Network Engineer": {"Full": 55000.00, "Part": 350.55}, "Systems Administrator": {"Full": 50000.00, "Part": 314.69},
-                "IT Helpdesk": {"Full": 25000.00, "Part": 180.50}
+            # Human Resources
+            "HR Manager": {"Full": 70000.00, "Part": 402.30},
+            "Recruiter": {"Full": 30000.00, "Part": 172.41},
+            "Training Specialist": {"Full": 35000.00, "Part": 201.15},
+            "Compensation Analyst": {"Full": 40000.00, "Part": 229.89},
+            "HR Generalist": {"Full": 32000.00, "Part": 183.91},
+            # Engineering & Development (Tiered for realism)
+            "Junior Software Engineer": {"Full": 30000.00, "Part": 172.41},
+            "Mid-Level Software Engineer": {"Full": 60000.00, "Part": 344.83},
+            "Senior Software Engineer": {"Full": 110000.00, "Part": 632.18},
+            "Embedded Systems Developer": {"Full": 65000.00, "Part": 373.56},
+            "Mobile App Developer": {"Full": 65000.00, "Part": 373.56},
+            "DevOps Engineer": {"Full": 85000.00, "Part": 488.51},
+            "QA Automation Engineer": {"Full": 55000.00, "Part": 316.09},
+            "Frontend Developer": {"Full": 50000.00, "Part": 287.36},
+            "Backend Developer": {"Full": 60000.00, "Part": 344.83},
+            # Data Science & Analytics
+            "AI Engineer": {"Full": 95000.00, "Part": 545.98},
+            "Data Scientist": {"Full": 85000.00, "Part": 488.51},
+            "Data Engineer": {"Full": 75000.00, "Part": 431.03},
+            "Data Analyst": {"Full": 40000.00, "Part": 229.89},
+            # Cybersecurity & Governance
+            "Cybersecurity Analyst": {"Full": 75000.00, "Part": 431.03},
+            "Information Security Manager": {"Full": 120000.00, "Part": 689.66},
+            "Penetration Tester": {"Full": 80000.00, "Part": 459.77},
+            # Product & Design
+            "UI/UX Designer": {"Full": 50000.00, "Part": 287.36},
+            "Product Owner": {"Full": 90000.00, "Part": 517.24},
+            "Business Analyst": {"Full": 55000.00, "Part": 316.09},
+            # Support & Operations
+            "Technical Support Lead": {"Full": 45000.00, "Part": 258.62},
+            "Operations Coordinator": {"Full": 38000.00, "Part": 218.39},
+            "Project Manager": {"Full": 80000.00, "Part": 459.77},
+            "Scrum Master": {"Full": 85000.00, "Part": 488.51},
+            # IT Infrastructure & Cloud
+            "Cloud Architect": {"Full": 120000.00, "Part": 689.66},
+            "Network Engineer": {"Full": 45000.00, "Part": 258.62},
+            "Systems Administrator": {"Full": 45000.00, "Part": 258.62},
+            "Systems Engineer": {"Full": 55000.00, "Part": 316.09},
+            "IT Helpdesk": {"Full": 25000.00, "Part": 143.68}
         }
 
         ctk.CTkLabel(self.create_emp, 
@@ -437,8 +457,8 @@ class HomePageFrame(ctk.CTkFrame):
 
         self.toplevelwindow = self.save_btn.winfo_toplevel()
     
-    #Logic to automaticallly insert the position
     def update_position_list(self, selected_dept):
+        "Auto POsitioning of dropdown values"
         positions = self.dept_pos_map.get(selected_dept, [])
         self.position_dropdown.configure(values=positions)
         self.position_dropdown.set("") 
@@ -448,8 +468,8 @@ class HomePageFrame(ctk.CTkFrame):
         self.salary_entry.insert(0, "₱0")
         self.salary_entry.configure(state="readonly")
 
-    #Logic to automatically insert the salary
     def update_salary_display(self, pos):
+        """Auto Insert Salary Display"""
         is_part_time = self.emp_dropdown.get() == "Part-Time"
         rates = self.salary_rates.get(pos, {"Full": 0, "Part": 0})
         amount = rates["Part"] if is_part_time else rates["Full"]
@@ -458,12 +478,14 @@ class HomePageFrame(ctk.CTkFrame):
         self.salary_entry.delete(0, "end")
         self.salary_entry.insert(0, f"₱{amount}")
         self.salary_entry.configure(state="readonly")
-
-    #Logic For Employee Type Entries Showing
+    
     def handle_emp_status(self, status):
+        """Logic for UI Switching in Status"""
         if status == "Part-Time":
             self.salary_label.configure(text="Hourly Rate")
             self.hours_worked_label.grid(row=0, column=2, sticky="e", padx=5, pady=10)
+            self.hours_worked.insert("end", "160")
+            self.hours_worked.configure(state="readonly")
             self.hours_worked.grid(row=0, column=3, sticky="e", padx=5, pady=10)
         else:
             self.salary_label.configure(text="Monthly Salary")
@@ -471,8 +493,9 @@ class HomePageFrame(ctk.CTkFrame):
             self.hours_worked_label.grid_forget()
             self.hours_worked.grid_forget()
 
-    #Safety Net if someone accidently close the window while creating
+    
     def event_exit_win(self):
+        """Safety Net if exit accidently"""
         if self.name_entry.get() != "":
             if messagebox.askyesno("Exit", "You have unsaved data. Are you sure you want to close this window?"):
                 self.create_emp.destroy()
@@ -482,9 +505,8 @@ class HomePageFrame(ctk.CTkFrame):
         else:
             self.create_emp.destroy()
             
-
-    #This Function Handle The Creation Of An Employee Object
     def handle_employee_data(self):
+        """Handles Employees Data"""
         try:
             manager = self.master.payroll_system
             
@@ -524,7 +546,8 @@ class HomePageFrame(ctk.CTkFrame):
                 self.email_entry.focus()
                 return 
             
-            if len(bank_account) != 14 or bank_account.count("-") != 2:
+            clean_account = bank_account.replace("-", "")
+            if len(bank_account) != 14 or bank_account.count("-") != 2 or not clean_account:
                 messagebox.showerror(
                     "Validation Error", 
                     f"Invalid Account Format!\n\n"
@@ -549,7 +572,6 @@ class HomePageFrame(ctk.CTkFrame):
             self.toplevelwindow.lift()
             self.toplevelwindow.focus_force()
 
-            #after creation logic
             self.salary_entry.configure(state="normal")
             self.salary_entry.delete(0, "end")
             self.salary_entry.insert(0, "₱0")
@@ -577,8 +599,8 @@ class HomePageFrame(ctk.CTkFrame):
             self.toplevelwindow.lift()
             self.toplevelwindow.focus_force()
 
-    #Open Delete Employee Window
     def open_delete_employee_win(self):
+        """Open Delete Window"""
         self.del_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.del_win.title("Delete Employee")
         self.del_win.geometry("400x250")
@@ -600,8 +622,8 @@ class HomePageFrame(ctk.CTkFrame):
                                         command=self.handle_delete_action)
         delete_confirm_btn.pack(pady=20)
 
-    #This Function Handle The Deletion of Employee
     def handle_delete_action(self):
+        """Handles Delete"""
         query = self.del_id_entry.get().strip()
         manager = self.master.payroll_system
 
@@ -683,8 +705,8 @@ class HomePageFrame(ctk.CTkFrame):
             messagebox.showerror("Not Found", f"No employee found matching '{query}'.")
             self.search_win.lift()
 
-    #Open Edit Employee Window
     def open_edit_employee_win(self):
+        """Open EDIT EMP WINDOW"""
         self.edit_prompt_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.edit_prompt_win.title("Edit Employee Lookup")
         self.edit_prompt_win.geometry("380x180")
@@ -710,9 +732,8 @@ class HomePageFrame(ctk.CTkFrame):
 
         ctk.CTkButton(self.edit_prompt_win, text="Proceed to Edit", fg_color="#12E068", text_color="black", command=submit_lookup).pack(pady=15)
 
-    #Launches the identical form of creation but for editing employee
     def launch_edit_form_window(self, emp_obj):
-        """Constructs an editing window looking EXACTLY like open_create_employee_win."""
+        """Launches the edit form"""
         self.edit_emp_win = ctk.CTkToplevel(self.winfo_toplevel())
         self.edit_emp_win.title("Editing Employee Records")
         self.edit_emp_win.geometry("500x700")
@@ -721,25 +742,56 @@ class HomePageFrame(ctk.CTkFrame):
         self.edit_emp_win.deiconify()
 
         self.dept_pos_map = {
-                "Human Resources": ["HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst"],
-                "Engineering & Development": ["Software Engineer", "Embedded Systems Developer", "Mobile App Developer", "DevOps Engineer", "QA Automation Engineer"],
-                "Data & Security": ["AI Engineer", "Data Scientist", "Cybersecurity Analyst", "Database Administrator"],
-                "Support & Operations": ["UI/UX Developer", "Technical Support Lead", "Operations Coordinator", "Project Manager"],
-                "IT Infrastructure & Cloud": ["Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk"]
+                "Human Resources": ["HR Manager", "Recruiter", "Training Specialist", "Compensation Analyst", "HR Generalist"],
+                "Engineering & Development": ["Junior Software Engineer", "Mid-Level Software Engineer", "Senior Software Engineer", "Embedded Systems Developer", "Mobile App Developer", "DevOps Engineer", "QA Automation Engineer", "Frontend Developer", "Backend Developer"],
+                "Data Science & Analytics": ["AI Engineer", "Data Scientist", "Data Analyst", "Data Engineer"],
+                "Cybersecurity & Governance": ["Cybersecurity Analyst", "Information Security Manager", "Penetration Tester"],
+                "Product & Design": ["UI/UX Designer", "Product Owner", "Business Analyst"],
+                "Support & Operations": ["Technical Support Lead", "Operations Coordinator", "Project Manager", "Scrum Master"],
+                "IT Infrastructure & Cloud": ["Cloud Architect", "Network Engineer", "Systems Administrator", "IT Helpdesk", "Systems Engineer"]
         }
 
         self.salary_rates = {
-                "Software Engineer": {"Full": 55000.00, "Part": 343.75}, "Embedded Systems Developer": {"Full": 65000.00, "Part": 444.50},
-                "Mobile App Developer": {"Full": 55000.00, "Part": 325.75}, "DevOps Engineer": {"Full": 70000.00, "Part": 468.35},
-                "QA Automation Engineer": {"Full": 50000.00, "Part": 312.90}, "AI Engineer": {"Full": 85000.00, "Part": 534.75},
-                "Data Scientist": {"Full": 80000.00, "Part": 515.50}, "Cybersecurity Analyst": {"Full": 75000.00, "Part": 496.90},
-                "Database Administrator": {"Full": 65000.00, "Part": 450.00}, "HR Manager": {"Full": 45000.00, "Part": 300.00},
-                "Recruiter": {"Full": 35000.00, "Part": 241.55}, "Training Specialist": {"Full": 40000.00, "Part": 369.90},
-                "Compensation Analyst": {"Full": 42000.00, "Part": 312.00}, "UI/UX Developer": {"Full": 50000.00, "Part": 320.50},
-                "Technical Support Lead": {"Full": 35000.00, "Part": 243.10}, "Operations Coordinator": {"Full": 38000.00, "Part": 230.50},
-                "Project Manager": {"Full": 65000.00, "Part": 350.98}, "Cloud Architect": {"Full": 95000.00, "Part": 600.00},
-                "Network Engineer": {"Full": 55000.00, "Part": 350.55}, "Systems Administrator": {"Full": 50000.00, "Part": 314.69},
-                "IT Helpdesk": {"Full": 25000.00, "Part": 180.50}
+            # Human Resources
+            "HR Manager": {"Full": 70000.00, "Part": 402.30},
+            "Recruiter": {"Full": 30000.00, "Part": 172.41},
+            "Training Specialist": {"Full": 35000.00, "Part": 201.15},
+            "Compensation Analyst": {"Full": 40000.00, "Part": 229.89},
+            "HR Generalist": {"Full": 32000.00, "Part": 183.91},
+            # Engineering & Development (Tiered for realism)
+            "Junior Software Engineer": {"Full": 30000.00, "Part": 172.41},
+            "Mid-Level Software Engineer": {"Full": 60000.00, "Part": 344.83},
+            "Senior Software Engineer": {"Full": 110000.00, "Part": 632.18},
+            "Embedded Systems Developer": {"Full": 65000.00, "Part": 373.56},
+            "Mobile App Developer": {"Full": 65000.00, "Part": 373.56},
+            "DevOps Engineer": {"Full": 85000.00, "Part": 488.51},
+            "QA Automation Engineer": {"Full": 55000.00, "Part": 316.09},
+            "Frontend Developer": {"Full": 50000.00, "Part": 287.36},
+            "Backend Developer": {"Full": 60000.00, "Part": 344.83},
+            # Data Science & Analytics
+            "AI Engineer": {"Full": 95000.00, "Part": 545.98},
+            "Data Scientist": {"Full": 85000.00, "Part": 488.51},
+            "Data Engineer": {"Full": 75000.00, "Part": 431.03},
+            "Data Analyst": {"Full": 40000.00, "Part": 229.89},
+            # Cybersecurity & Governance
+            "Cybersecurity Analyst": {"Full": 75000.00, "Part": 431.03},
+            "Information Security Manager": {"Full": 120000.00, "Part": 689.66},
+            "Penetration Tester": {"Full": 80000.00, "Part": 459.77},
+            # Product & Design
+            "UI/UX Designer": {"Full": 50000.00, "Part": 287.36},
+            "Product Owner": {"Full": 90000.00, "Part": 517.24},
+            "Business Analyst": {"Full": 55000.00, "Part": 316.09},
+            # Support & Operations
+            "Technical Support Lead": {"Full": 45000.00, "Part": 258.62},
+            "Operations Coordinator": {"Full": 38000.00, "Part": 218.39},
+            "Project Manager": {"Full": 80000.00, "Part": 459.77},
+            "Scrum Master": {"Full": 85000.00, "Part": 488.51},
+            # IT Infrastructure & Cloud
+            "Cloud Architect": {"Full": 120000.00, "Part": 689.66},
+            "Network Engineer": {"Full": 45000.00, "Part": 258.62},
+            "Systems Administrator": {"Full": 45000.00, "Part": 258.62},
+            "Systems Engineer": {"Full": 55000.00, "Part": 316.09},
+            "IT Helpdesk": {"Full": 25000.00, "Part": 143.68}
         }
 
         ctk.CTkLabel(self.edit_emp_win, text="Modify Employee Info", text_color="black", font=("Helvetica", 40, "bold")).pack(padx=5, pady=15)
@@ -798,7 +850,9 @@ class HomePageFrame(ctk.CTkFrame):
             self.salary_label.configure(text="Hourly Rate")
             self.hours_worked_label.grid(row=0, column=2, sticky="e", padx=5, pady=10)
             self.hours_worked.grid(row=0, column=3, sticky="e", padx=5, pady=10)
+            self.hours_worked.configure(state="normal")
             self.hours_worked.insert(0, str(emp_obj.hours_worked))
+            self.hours_worked.configure(state="readonly")
             self.salary_entry.insert(0, f"₱{emp_obj.hourly_rate}")
         else:
             self.salary_label.configure(text="Monthly Salary")
@@ -820,8 +874,9 @@ class HomePageFrame(ctk.CTkFrame):
         self.save_btn.pack(pady=20)
         self.toplevelwindow = self.save_btn.winfo_toplevel()
 
-    #THis Function THe Editing LOgic
+    
     def handle_edit_employee_data(self):
+        """Handles Editing/Updating Employees Data"""
         try:
             manager = self.master.payroll_system
             eid = self.id_entry.get()
@@ -857,7 +912,8 @@ class HomePageFrame(ctk.CTkFrame):
                 self.email_entry.focus()
                 return 
             
-            if len(bank_account) != 14 or bank_account.count("-") != 2:
+            clean_account = bank_account.replace("-", "")
+            if len(bank_account) != 14 or bank_account.count("-") != 2 or not clean_account:
                 messagebox.showerror(
                     "Validation Error", 
                     f"Invalid Account Format!\n\n"
@@ -882,7 +938,6 @@ class HomePageFrame(ctk.CTkFrame):
         except ValueError:
             messagebox.showerror("Input Error", "Please ensure numeric fields contain valid quantities.", parent=self.edit_emp_win)
 
-#View EMployees Frame
 class ViewEmployeesFrame(ctk.CTkFrame):
     def __init__(self, master, on_back):
         super().__init__(master, fg_color="white")
@@ -948,8 +1003,8 @@ class ViewEmployeesFrame(ctk.CTkFrame):
                     command=on_back, 
                     width=200, height=40).pack(side="right", padx=5)
 
-    #HAndles Sorting in Gui
     def handle_sorting(self, choice=None):
+        """Handles Sorting"""
         sorter_tool = self.master.sorter
         
         if choice is None:
@@ -970,6 +1025,7 @@ class ViewEmployeesFrame(ctk.CTkFrame):
         self.update_treeview(sorted_list)
 
     def update_treeview(self, employee_list):
+        """Updating Table"""
         for item in self.tree.get_children():
             self.tree.delete(item)
         for emp in employee_list:
@@ -1069,7 +1125,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         ctk.CTkLabel(self.right_panel, text="Working Days:", text_color="black", font=self.primary_font).grid(row=4, column=0, padx=20, pady=10, sticky="w")
         self.total_days_entry = ctk.CTkEntry(self.right_panel, width=150)
         self.total_days_entry.grid(row=4, column=1, sticky="w")
-        self.total_days_entry.insert(0, "22")
+        self.total_days_entry.insert(0, "24")
         self.total_days_entry.configure(state="readonly")
 
         ctk.CTkLabel(self.right_panel, text="Absenses:", text_color="black", font=self.primary_font).grid(row=5, column=0, padx=20, pady=10, sticky="w")
@@ -1179,7 +1235,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             messagebox.showerror("Error", "Employee Not Found")
 
     def add_to_pay_queue(self):
-        """Captures current screen state parameters, includes absences metrics, and stages the worker to the batch queue."""
+        """stages the worker to the batch queue."""
         target_id = self.search_id_entry.get().strip() 
         if not target_id:
             messagebox.showwarning("Input Error", "Please provide a valid Employee ID to stage for batch processing.")
@@ -1189,7 +1245,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
         ot_val = 0.0
         absences_input = 0
-        days_val = 22
+        days_val = 24
 
         if not emp:
             messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
@@ -1249,11 +1305,10 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
     def compute_payroll(self):
         """Computes Singe Payroll"""
-        import datetime
         try:
             target_id = self.search_id_entry.get().strip()
 
-            hours_val = None
+            hours_val = 160
             absences_input = 0
             ot_val = 0
 
@@ -1266,16 +1321,13 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 messagebox.showerror("Not Found", f"No employee found with ID: {target_id}")
                 return
 
-            # --- DYNAMIC CALENDAR PERIOD STRINGS GENERATION ---
             current_date = self.master.current_system_time
             pay_period_start = current_date.replace(day=1)
             _, last_day = calendar.monthrange(current_date.year, current_date.month)
             pay_period_end = current_date.replace(day=last_day)
             
-            # Matches your exact required database layout: e.g., "May 01-31 2026"
             formatted_period_date = f"{pay_period_start.strftime('%B %d-')}{pay_period_end.strftime('%d %Y')}"
 
-            # --- MONTHLY DUPLICATE GUARD INTERCEPTION LOCK ---
             if self.master.file_handler.is_period_already_processed(emp.id, formatted_period_date):
                 messagebox.showerror(
                     "Payroll Cycle Lock",
@@ -1292,15 +1344,14 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                     messagebox.showerror("Typing Error", "Absences field must contain a valid number.")
                     return
 
-            if emp.emp_type == "Part-Time":
-                if hasattr(self, 'hours_entry') and self.hours_entry.get().strip():
+            if hasattr(self, 'hours_entry'):
+                raw_hours = self.hours_entry.get().strip()
+                if raw_hours:
                     try:
-                        hours_val = float(self.hours_entry.get().strip())
+                        hours_val = float(raw_hours)
                     except ValueError:
-                        messagebox.showerror("Typing Error", "Hours Worked field must contain a valid numeric number.")
+                        messagebox.showerror("Typing Error", "Hours Worked entry must be a valid number.")
                         return
-                else:
-                    hours_val = getattr(emp, 'hours_worked', 160.0)
 
             if emp.emp_type == "Full-Time":
                 if hasattr(self, 'ot_hours_entry') and self.ot_hours_entry.get().strip():
@@ -1320,7 +1371,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             pay_data["reg_pay"], pay_data["ot_pay"], pay_data["gross"],
             pay_data["vat"], pay_data["ph"], pay_data["sss"], pay_data["pag"],
             pay_data["absent"], pay_data["net"], f"{pay_period_start.strftime("%B %d-")}{pay_period_end.strftime("%d %Y")}",
-            self.generate_transaction_id()
+            self.generate_transaction_id(), hours_worked=hours_val
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, pay_data["net"])
@@ -1334,7 +1385,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 self.net_salary_entry.insert(0, f"{pay_data['net']:.2f}")
 
 
-            self.display_payslip(emp, pay_data, current_date)
+            self.display_payslip(emp, pay_data, current_date, hours_worked=hours_val)
 
         except ValueError:
             messagebox.showerror("Error", "Please ensure all numeric fields are filled correctly.")
@@ -1346,7 +1397,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         return f"TXN-{current_date}-{random_suffix}"
 
-    def display_payslip(self, emp, pay_data, date_string):
+    def display_payslip(self, emp, pay_data, date_string, hours_worked=160.0):
         slip_toplevel = ctk.CTkToplevel(self.master)
         slip_toplevel.withdraw() 
         slip_toplevel.title(f"Official Salary Slip for {emp.name}")
@@ -1354,6 +1405,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.resizable(False, False)
         slip_toplevel.configure(fg_color="white")
         current_date = self.master.current_system_time
+        hour_str = f"{hours_worked:.0f}"
         
         banner = ctk.CTkFrame(slip_toplevel, fg_color="#000000", corner_radius=0, height=40)
         banner.pack(fill="x", side="top")
@@ -1386,7 +1438,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         ctk.CTkLabel(right_box, text="SALARY DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
         if emp.emp_type == "Part-Time":
             self._create_slip_row(right_box, "HOURLY RATE", f"Php {emp.hourly_rate:,.2f}")
-            self._create_slip_row(right_box, "HOURS WORKED", f"{emp.hours_worked:.0f} hrs")
+            self._create_slip_row(right_box, "HOURS WORKED", f"{hour_str} hrs")
         self._create_slip_row(right_box, "REGULAR PAY", f"Php {pay_data['reg_pay']:,.2f}")
         self._create_slip_row(right_box, "OVERTIME", f"Php {pay_data['ot_pay']:,.2f}")
         self._create_slip_row(right_box, "GROSS SALARY", f"Php {pay_data['gross']:,.2f}")
@@ -1416,6 +1468,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         _, last_day = calendar.monthrange(current_date.year, current_date.month)
         pay_period_end = current_date.replace(day=last_day)
         pay_date = pay_period_end + datetime.timedelta(days=1)
+
         self._create_slip_row(additional_container, "PAYMENT DATE", pay_date.strftime('%b %d, %Y'))
         self._create_slip_row(additional_container, "PAY PERIOD", f"{pay_period_start.strftime('%b %d, %Y')} - {pay_period_end.strftime('%b %d, %Y')}")
         self._create_slip_row(additional_container, "JOIN DATE", f"{emp.hire_date}")
@@ -1438,7 +1491,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
         slip_toplevel.focus_force()
 
     def _create_slip_row(self, parent, label_text, value_text):
-        """Creates a clean, explicit row with label and value aligned to ends."""
+        """helper function: Creates a clean, explicit row with label and value aligned to ends."""
         row = ctk.CTkFrame(parent, fg_color="white", border_color="black", border_width=1, corner_radius=0)
         row.pack(fill="x")
         
@@ -1449,7 +1502,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                     anchor="e", padx=10).pack(side="right", fill="x", expand=True, pady=2)
         
     def process_and_display_all_queued(self):
-        """Dequeues every employee, computes salaries, saves to database, and shows an elegant batch summary window."""
+        """Dequeues every employee, computes salaries, saves to database, and shows an batch summary window."""
         import datetime
         queue = self.master.payroll_queue
 
@@ -1459,13 +1512,11 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
 
         processed_slips = []
 
-        # --- DYNAMIC CALENDAR PERIOD STRINGS GENERATION ---
         current_date = self.master.current_system_time
         pay_period_start = current_date.replace(day=1)
         _, last_day = calendar.monthrange(current_date.year, current_date.month)
         pay_period_end = current_date.replace(day=last_day)
             
-        # Matches your exact required database layout: e.g., "May 01-31 2026"
         formatted_period_date = f"{pay_period_start.strftime('%B %d-')}{pay_period_end.strftime('%d %Y')}"
 
         while not queue.is_empty():
@@ -1485,7 +1536,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
             
             if emp.emp_type == "Full-Time":
                 hours_override_param = float(days_val)
-            else:  # Part-Time
+            else:  
                 hours_override_param = hours_val
 
             pay_data = emp.calculate_payroll_breakdown(hours_override=hours_override_param, absences_count=int(absences_to_charge), ot_hours=float(ot_val))
@@ -1504,7 +1555,7 @@ class ProcessEmployeeFrame(ctk.CTkFrame):
                 pay_data["reg_pay"], pay_data["ot_pay"], final_gross,
                 final_vat, final_ph, final_sss, final_pag,
                 final_absent, final_net, f"{pay_period_start.strftime("%B %d-")}{pay_period_end.strftime("%d %Y")}",
-                self.generate_transaction_id()
+                self.generate_transaction_id(), hours_worked=hours_val
             )
 
             self.master.salary_records.add_record(str(emp.id), emp.name, final_net)
@@ -1633,7 +1684,7 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         banner = ctk.CTkFrame(self, fg_color="#A0A9A4", height=60, corner_radius=0)
         banner.pack(fill="x", side="top")
         
-        ctk.CTkLabel(banner, text="SALARY TRANSACTION LEDGER", 
+        ctk.CTkLabel(banner, text="SALARY TRANSACTION HISTORY", 
                     text_color="black", font=("Helvetica", 20, "bold")).pack(side="left", padx=20, pady=15)
         
         ctk.CTkButton(banner, text="Back to Dashboard", fg_color="#333333", hover_color="#555555",
@@ -1654,15 +1705,39 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
         self.table_container.pack(fill="both", expand=True, padx=20, pady=15)
 
         self.load_records_table()
+    
+    def trigger_undo_payroll_action(self, ref_no, emp_name):
+        """Asks for confirmation and rolls back/deletes the chosen payslip transaction."""
+        confirm = messagebox.askyesno(
+            "Confirm Undo", 
+            f"Are you sure you want to undo and permanently delete payroll transaction {ref_no} for {emp_name}?"
+        )
+        if confirm:
+            success = self.master.file_handler.remove_salary_slip_record(ref_no)
+            if success:
+                messagebox.showinfo("Success", f"Transaction {ref_no} successfully undone and deleted.")
+                self.load_records_table()
+            else:
+                messagebox.showerror("Error", "Could not find or delete the transaction record.")
+    def copy_ref_to_clipboard(self, reference_number):
+        """Copies the clicked transaction reference number to the system clipboard."""
+        try:
+            self.master.clipboard_clear()
+            self.master.clipboard_append(reference_number)
+            self.master.update() # Keeps clipboard alive after application focus shifts
+            
+            # Show a brief, non-blocking confirmation message box
+            messagebox.showinfo("Copied", f"Reference number '{reference_number}' copied to clipboard!")
+        except Exception as e:
+            print(f"[UI Error] Failed to update system clipboard container: {e}")
 
     def load_records_table(self):
-        """Clears old rows and reads database dictionaries to populate historical listings."""
+        """Load the records to the table/treeview."""
         for widget in self.table_container.winfo_children():
             widget.destroy()
 
-        # Added "Actions" layout header column reference
-        headers = ["Ref No.", "Date", "Employee ID", "Name", "Department", "Gross Pay", "Deductions", "Net Salary", "Actions"]
-        widths = [110, 100, 80, 160, 130, 110, 110, 110, 90]
+        headers = ["Ref No.", "Date", "Employee ID", "Name", "Department", "Gross Pay", "Net Salary", "Actions"]
+        widths = [110, 100, 100, 160, 160, 140, 110, 100]
 
         header_row = ctk.CTkFrame(self.table_container, fg_color="#e0e0e0", corner_radius=0)
         header_row.pack(fill="x", pady=(0, 5))
@@ -1690,7 +1765,6 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                 row_frame = ctk.CTkFrame(self.table_container, fg_color=bg_color, corner_radius=0)
                 row_frame.pack(fill="x", pady=1)
 
-                total_deductions = slip['vat'] + slip['ph'] + slip['sss'] + slip['pag'] + slip['absent']
 
                 data_fields = [
                     slip.get('ref_no', "N/A"),
@@ -1699,37 +1773,38 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                     slip['name'],
                     slip['dept'],
                     f"Php {slip['gross']:,.2f}",
-                    f"Php {total_deductions:,.2f}",
                     f"Php {slip['net']:,.2f}"
                 ]
 
-                # Populate raw values tracking slice limits up to the actions margin boundary
                 for text, w in zip(data_fields, widths[:-1]):
+                    is_ref = (text == slip.get('ref_no', "N/A"))
                     val_lbl = ctk.CTkLabel(row_frame, text=str(text), width=w, text_color="black", font=("Helvetica", 12), anchor="w")
                     val_lbl.pack(side="left", padx=10, pady=6)
 
-                # Standard Python dictionary profile reconstruction wrapper
+                    if is_ref and text != "N/A":
+                        val_lbl.configure(cursor="hand2")
+                        
+                        # Bind left-mouse-click to copy to clipboard function
+                        val_lbl.bind(
+                            "<Button-1>", 
+                            lambda event, ref=str(text): self.copy_ref_to_clipboard(ref)
+                        )
 
-                # 2. Build the template dictionary map mapping class object fields safely
                 if hasattr(manager, 'search_employee_by_id'):
                     live_emp = manager.search_employee_by_id(emp_id)
                 mock_emp_dict = {
                     'id': emp_id,
                     'name': slip['name'],
                     'department': slip['dept'],
-                    
-                    # Pull values dynamically from the Object properties, falling back to history slip log defaults if not found
                     'position': getattr(live_emp, 'position', slip.get('pos', 'Staff')),
                     'emp_type': getattr(live_emp, 'emp_type', slip.get('emp_type', 'Full-Time')),
                     'hourly_rate': getattr(live_emp, 'hourly_rate', slip.get('hourly_rate', 0.0)),
                     'hours_worked': slip.get('hours_worked', 0.0),
-                    
-                    # --- FIXED: Access the raw object attribute data properties natively ---
                     'hire_date': getattr(live_emp, 'hire_date', 'N/A'),
                     'bank_account': getattr(live_emp, 'bank_account', 'N/A')
                 }
-                # Interactive Action button mapped seamlessly to pure Python dictionaries via keyword lambda capturing
-                action_btn = ctk.CTkButton(
+
+                action_btn1 = ctk.CTkButton(
                     row_frame, 
                     text="View Slip", 
                     width=widths[-1], 
@@ -1739,7 +1814,18 @@ class ViewSalaryRecordsFrame(ctk.CTkFrame):
                     hover_color="#555555",
                     command=lambda e=mock_emp_dict, s=slip, d=slip['date']: PayslipModal(self.master, e, s, d)
                 )
-                action_btn.pack(side="left", padx=10, pady=4)
+                action_btn1.pack(side="left", padx=10, pady=4)
+                action_btn2 = ctk.CTkButton(
+                    row_frame,
+                    text="Undo", 
+                    width=widths[-1], 
+                    height=24,
+                    font=("Helvetica", 11, "bold"),
+                    fg_color="#FF0000",
+                    hover_color="#555555",
+                    command=lambda ref=slip.get("ref_no", ""), name=slip.get("name", ""): self.trigger_undo_payroll_action(ref, name)
+                )
+                action_btn2.pack(side="left", padx=10, pady=4)
 
                 row_counter += 1
 
@@ -1751,13 +1837,10 @@ class PayslipModal(ctk.CTkToplevel):
     def __init__(self, master, emp, pay_data, date_string, **kwargs):
         super().__init__(master, **kwargs)
         
-        # --- EXACT COPIED METHOD WINDOW INITIALIZATION ---
         self.title(f"Official Salary Slip for {emp['name']}")
         self.geometry("900x750")
         self.resizable(False, False)
         self.configure(fg_color="white")
-        
-        # Lock user interaction exclusively to this modal layer
         self.attributes("-topmost", True)
         self.focus_force()
         current_date = self.master.current_system_time
@@ -1813,30 +1896,25 @@ class PayslipModal(ctk.CTkToplevel):
         self._create_slip_row(deduct_container, "SSS", f"Php {pay_data['sss']:,.2f}")
         self._create_slip_row(deduct_container, "PAG-IBIG", f"Php {pay_data['pag']:,.2f}")
         self._create_slip_row(deduct_container, "ABSENCE PENALTY", f"Php {pay_data['absent']:,.2f}")
-        total_ded = pay_data['vat'] + pay_data['ph'] + pay_data['sss'] + pay_data['pag'] + pay_data['absent']
-        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {total_ded:,.2f}")
+        total_deductions = pay_data['vat'] + pay_data['ph'] + pay_data['sss'] + pay_data['pag'] + pay_data['absent']
+        self._create_slip_row(deduct_container, "TOTAL DEDUCTIONS", f"Php {total_deductions:,.2f}")
 
         # Right Bottom: Additional Details
         additional_container = ctk.CTkFrame(mid_grid, fg_color="transparent")
         additional_container.pack(side="right", anchor="n", expand=True, fill="x")
         ctk.CTkLabel(additional_container, text="ADDITIONAL DETAILS", text_color="black", font=("Helvetica", 14, "bold")).pack(anchor="w")
         
-        parts = date_string.strip().split(" ") # ["May", "01-31", "2026"]
-        month_name = parts[0]
-        day_range = parts[1]               # "01-31"
+        parts = date_string.strip().split(" ")
+        month_name = parts[0]         
         year_string = parts[2]
             
-        header_month_year = f"{month_name} {year_string}".upper()
-            
-        # The payment date is supposed to be the 1st of the next month.
-        # We can create a datetime object from the historical string to parse it cleanly
-        historical_dt = datetime.datetime.strptime(f"{month_name} 1 {year_string}", "%B %d %Y")
-        _, last_day = calendar.monthrange(historical_dt.year, historical_dt.month)
-        pay_period_end = historical_dt.replace(day=last_day)
+        pay_period_start = datetime.datetime.strptime(f"{month_name} 1 {year_string}", "%B %d %Y")
+        _, last_day = calendar.monthrange(pay_period_start.year, pay_period_start.month)
+        pay_period_end = pay_period_start.replace(day=last_day)
         pay_date = pay_period_end + datetime.timedelta(days=1)
             
         formatted_pay_date = pay_date.strftime('%b %d, %Y')
-        formatted_pay_period = f"{historical_dt.strftime('%b 01, %Y')} - {pay_period_end.strftime('%b %d, %Y')}"
+        formatted_pay_period = f"{pay_period_start} - {pay_period_end.strftime('%b %d, %Y')}"
         
         self._create_slip_row(additional_container, "PAYMENT DATE", formatted_pay_date)
         self._create_slip_row(additional_container, "PAY PERIOD", formatted_pay_period)
@@ -1890,11 +1968,12 @@ class PayrollSystemApp(ctk.CTk):
             self.destroy()
     
     def show_admin_page(self):
+        """Shows Admin Page"""
         self.current_frame = AdminLoginFrame(self, self.show_home_page)
         self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
 
     def show_home_page(self, username):
-
+        """Shows Home Page"""
         self.auth_user = username
 
         if self.current_frame:
@@ -1906,7 +1985,7 @@ class PayrollSystemApp(ctk.CTk):
         self.current_frame.pack(fill="both", expand=True)
 
     def show_view_all_page(self):
-        """Hides current frame and shows the Employee List."""
+        """shows the Employee List."""
         if self.current_frame:
             self.current_frame.pack_forget() 
             self.current_frame.place_forget()
@@ -1930,7 +2009,7 @@ class PayrollSystemApp(ctk.CTk):
             self.show_admin_page()
     
     def show_process_page(self):
-        """Hides current frame and shows the Process Employee Page."""
+        """shows the Process Employee Page."""
         if self.current_frame:
             self.current_frame.pack_forget()
             self.current_frame.place_forget()
@@ -1939,12 +2018,11 @@ class PayrollSystemApp(ctk.CTk):
         self.current_frame.pack(fill="both", expand=True)
 
     def show_salary_records_page(self):
-        """Hides current frame context and exposes the historical transactions ledger."""
+        """shows history transactions."""
         if self.current_frame:
             self.current_frame.pack_forget()
             self.current_frame.place_forget()
 
-        # Route viewport frame execution context
         self.current_frame = ViewSalaryRecordsFrame(self, on_back=self.show_home_after_salary_records)
         self.current_frame.pack(fill="both", expand=True)
 

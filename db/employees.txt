@@ -1,14 +1,5 @@
-1|Marc Jay Sumayaw|Male|IT Infrastructure & Cloud|Cloud Architect|July 09, 2024|mjjs@gm.com|2341-3142-3522|Full-Time|95000.0|0|0
-2|Marc Emerson Chavez|Male|Support & Operations|UI/UX Developer|May 05, 2025|marcemer@g.com|3253-5436-6574|Full-Time|50000.0|0|0
-3|Jose Albert Ray Pasia|Male|IT Infrastructure & Cloud|Cloud Architect|September 25, 2025|jray@g.com|3234-5477-6585|Part-Time|96000.0|160.0|600.0
-4|Gericho De Castro|Male|IT Infrastructure & Cloud|Cloud Architect|May 14, 2026|ggdecastro@g.com|2194-3256-5488|Part-Time|96000.0|160.0|600.0
-6|Emjay Flores|Male|Human Resources|Training Specialist|May 02, 2026|rihanna@g.com|3293-5488-0876|Part-Time|59184.0|160.0|369.9
-1001|Naruto Uzumaki|Male|Data & Security|Cybersecurity Analyst|May 11, 2026|lanoire@g.com|2394-2342-3254|Full-Time|75000.0|0|0
-1002|Daniel Padilla|Male|IT Infrastructure & Cloud|Cloud Architect|May 13, 2026|dpadilla@g.com|9756-6436-3477|Full-Time|75000.0|0|0
-1004|Marc Justine De Vera|Male|Data & Security|Data Scientist|May 13, 2026|marcjustdv@g.com|2344-2342-2356|Part-Time|82480.0|160.0|515.5
-1008|Darren Espanto|Male|Human Resources|Compensation Analyst|May 14, 2026|darreng@g.com|2352-6457-5747|Part-Time|49920.0|160.0|312.0
-1011|JunJun Mendoza|Male|Support & Operations|UI/UX Developer|May 14, 2026|junjunm@g.com|3294-3256-5747|Full-Time|45240.0|0|0
-1012|Rowie Montero|Male|IT Infrastructure & Cloud|IT Helpdesk|May 14, 2026|rowrowmon@g.com|3056-6346-3462|Part-Time|28880.0|160.0|180.5
-1014|Raffy Tulfo|Male|Data & Security|AI Engineer|May 20, 2026|raffy@g.com|1243-3141-1341|Full-Time|85000.0|0|0
-1015|Xavier Alexander|Male|Engineering & Development|QA Automation Engineer|May 20, 2026|xvirealex@g.com|3241-3152-3252|Part-Time|50064.0|160.0|312.9
-1016|Joji|Female|Support & Operations|Operations Coordinator|May 20, 2026|21@don.com|2214-3256-5373|Full-Time|38000.0|0|0
+IT0000126|Marc Jay Sumayaw|Male|Engineering & Development|Junior Software Engineer|May 25, 2026|memarcjays20@gmail.com|5373-3253-5372|Part-Time|27585.6|160.0|172.41
+IT0000226|Rhyzen Mansibang|Male|Product & Design|Business Analyst|May 25, 2026|rhyzenm@gmail.com|7462-2353-8953|Part-Time|50574.4|160.0|316.09
+IT0000326|Marc Emerson Chavez|Male|Product & Design|UI/UX Designer|May 25, 2026|moimoi@gmail.com|3295-2356-4557|Part-Time|45977.6|160.0|287.36
+IT0000426|Jose Albert Ray Pasia|Male|Support & Operations|Technical Support Lead|May 25, 2026|rayri@gmail.com|2384-9742-1345|Part-Time|41379.2|160.0|258.62
+IT0000526|Gericho De Castro|Male|IT Infrastructure & Cloud|IT Helpdesk|May 25, 2026|gdecastro@gmail.com|2340-7547-8795|Full-Time|25000.0|160.0|0
